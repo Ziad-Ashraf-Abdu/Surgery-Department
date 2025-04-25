@@ -1,10 +1,10 @@
 import React from "react";
-import PatientHP from "./patientHP";
+import PatientHP from "./patientHP.jsx";
 import DoctorHP from "./doctorHP";
 import { patientUser, doctorUser } from "../data/sampleData";
 
 export default function App() {
-  return (y
+  return (
     <div>
       {/* Pass data via props */}
       <PatientHP user={patientUser} />

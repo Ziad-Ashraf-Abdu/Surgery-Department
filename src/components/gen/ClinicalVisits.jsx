@@ -1,14 +1,17 @@
 import React from "react";
 
-export default function ClinicalVisits({ appointments }) {
+export default function ClinicalVisits({ appointments, onAppointmentClick }) {
   return (
-    <div className="clinical-visits">
-      <h2>Clinical Visits</h2>
-      {appointments.map((appt, i) => (
-        <div key={i} className="visit-card">
-          <h3>{appt.doctorName}</h3>
+    <div className="visit-card">
+      <h3>Appointments</h3>
+      {appointments.map((appt, idx) => (
+        <div
+          key={idx}
+          className="med-facts clickable"
+          onClick={() => onAppointmentClick(appt)}
+        >
+          <span>{appt.doctorName}</span>
           <span>{appt.specialty}</span>
-          <p>{appt.address}</p>
         </div>
       ))}
     </div>

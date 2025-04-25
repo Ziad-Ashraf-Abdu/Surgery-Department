@@ -48,12 +48,26 @@ export const doctorUser = {
   id: "D20458",
   specialization: "Cardiology",
   department: "Cardiology Department",
-  photo: "https://via.placeholder.com/150",
+  photo: "https://www.planetware.com/wpimages/2019/11/canada-in-pictures-beautiful-places-to-photograph-morraine-lake.jpg",
   contact: {
     email: "ayesha.k@hospital.com",
     phone: "+919812345678",
     office: "Room 402, Cardio Wing",
   },
+  yearsExperience: 15,
+    credentials: ["MD", "PhD"],
+    certifications: ["ABIM Certified", "BLS", "ACLS"],
+    affiliations: ["American Medical Association"],
+    surgeriesThisWeek: [
+      { date: "April 25, 2025", time: "08:00", procedure: "Knee Arthroscopy", room: "3A" },
+      // …
+    ],
+    avgWaitTime: 12,
+    satisfactionScore: 4.7,
+    onCallSchedule: [
+      { date: "2025-04-27", shift: "7 pm–7 am" },
+      // …
+    ],
   todaySchedule: [
     { time: "09:00 AM", patient: "Neil S." },
     { time: "10:30 AM", patient: "Maria L." },
@@ -62,4 +76,5 @@ export const doctorUser = {
   ],
   notifications: ["2 pending lab reviews", "1 new message from Admin"],
   patientCount: 20,
+
 };

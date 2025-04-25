@@ -1,0 +1,921 @@
+/* doctorHP.css */
+/* Medical Professional Color Theme */
+:root {
+  --color-background: #D3FADB;   /* Pale Green */
+  --color-card-bg:    #F5FFFA;   /* white */
+  --color-primary:    #3A59D1;   /* Material Blue 700 */
+  --color-secondary:  #388E3C;   /* Material Green 700 */
+  --color-accent:     #00897B;   /* Material Teal 600 */
+  --color-text:       #212121;   /* dark gray */
+  --color-subtext:    #455A64;   /* medium gray */
+  --color-border:     #B0BEC5;   /* light gray */
+}
+
+/* Reset */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--color-background);
+  color: var(--color-text);
+  font-family: 'Segoe UI', system-ui, sans-serif; /* More modern stack */
+  line-height: 1.6;
+}
+
+/* Global Styles */
+.doctor-hp-container {
+  background: var(--color-background);
+  padding: 2rem;
+  max-width: 100%;
+  margin: 0 auto;
+  min-height: 100%;
+}
+
+/* Card Container */
+.doctor-card {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Grid Layout */
+.main-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Headers */
+.doctor-card h2,
+.doctor-card h3 {
+  margin: 0 0 0.75rem;
+  color: var(--color-primary);
+  font-weight: 600;
+  font-size: 1.25rem;
+}
+
+/* Profile Section */
+/* doctorHP.css */
+:root {
+  --color-background: #D3FADB;
+  --color-card-bg:    #F5FFFA;
+  --color-primary:    #3A59D1;
+  --color-secondary:  #388E3C;
+  --color-accent:     #00897B;
+  --color-text:       #212121;
+  --color-subtext:    #455A64;
+  --color-border:     #B0BEC5;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--color-background);
+  color: var(--color-text);
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  line-height: 1.6;
+}
+
+.doctor-hp-container {
+  padding: 2rem;
+  max-width: 100%;
+  margin: 0 auto;
+  min-height: 100%;
+}
+
+/* Cards */
+.doctor-card {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.doctor-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.profile-section {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+.profile-img {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--color-secondary);
+}
+.profile-details {
+  display: flex;
+  flex-direction: column;
+}
+.profile-details h2 {
+  margin: 0;
+  color: var(--color-primary);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+.profile-details p {
+  margin: 0.25rem 0;
+  color: var(--color-subtext);
+  font-size: 0.875rem;
+}
+/* Grid Layout */
+.main-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.panel-group {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+/* Schedule Items */
+.schedule-list li {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.time-badge {
+  background: var(--color-primary);
+  color: white;
+  padding: 0.35rem 0.75rem;
+  border-radius: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.status-indicator {
+  color: var(--color-secondary);
+  margin-left: auto;
+  font-size: 1.2rem;
+}
+
+/* Surgery List */
+.surgery-list li {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+}
+
+.surgery-time {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-subtext);
+}
+
+.room-tag {
+  background: rgba(0, 0, 0, 0.05);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  width: fit-content;
+}
+
+/* Metrics */
+.metric-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+}
+
+.metric-icon {
+  font-size: 1.5rem;
+}
+
+.metric-value {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--color-primary);
+  padding: 0.75rem
+}
+
+/* Notifications */
+.notification-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: rgba(255, 235, 59, 0.1);
+  border-radius: 0.5rem;
+  margin: 0.25rem 0;
+}
+
+.alert-icon {
+  color: #ffc107;
+  font-size: 1.2rem;
+}
+
+/* Buttons */
+.btn {
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
+  cursor: pointer;
+  font-weight: 500;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background-color: #2a4ab3;
+  transform: translateY(-1px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .main-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .panel-group {
+    grid-template-columns: 1fr;
+  }
+
+  .doctor-card {
+    padding: 1rem;
+  }
+}
+
+/* Badge */
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  background: var(--color-accent);
+  color: #ffffff;
+}
+
+/* Table & List Styles */
+.surgery-list,
+.schedule-list,
+.metrics-list,
+.oncall-list,
+.notifications-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.surgery-list li,
+.schedule-list li,
+.oncall-list li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+}
+.surgery-list li:hover,
+.schedule-list li:hover,
+.oncall-list li:hover {
+  background: rgba(25, 118, 210, 0.1); /* light blue hover */
+}
+
+/* Metrics Card */
+.metrics-list li {
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+  color: var(--color-text);
+}
+
+/* Buttons */
+.btn {
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
+  cursor: pointer;
+  font-weight: 500;
+  border: 1px solid transparent;
+}
+.btn-primary {
+  background-color: var(--color-primary);
+  color: #ffffff;
+  border-color: var(--color-primary);
+}
+.btn-secondary {
+  background-color: #ffffff;
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+.btn-primary:hover {
+  background-color: #1565C0; /* darker blue */
+}
+.btn-secondary:hover {
+  background-color: var(--color-primary);
+  color: #ffffff;
+}
+
+/* Header */
+.doctor-header-container {
+  padding-bottom: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+}
+.doctor-header-container .profile-img {
+  width: 60px;
+  height: 60px;
+  border: 2px solid var(--color-secondary);
+}
+
+/* Tabs */
+nav ul li {
+  padding-bottom: 0.5rem;
+}
+nav ul li.active {
+  border-color: var(--color-secondary);
+  color: var(--color-secondary);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 640px) {
+  .profile-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* Add to doctorHP.css */
+/* Notification Modal Styles */
+.notification-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.notification-modal {
+  background: var(--color-card-bg);
+  border-radius: 1rem;
+  padding: 2rem;
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--color-subtext);
+}
+
+.modal-close-btn:hover {
+  color: var(--color-primary);
+}
+
+.modal-content {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.modal-content p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.priority-tag {
+  background: rgba(255, 0, 0, 0.1);
+  color: #d32f2f;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+}
+
+/* Add cursor pointer to notifications */
+.notification-item {
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.notification-item:hover {
+  background: rgba(25, 118, 210, 0.05);
+}
+
+/* Accessibility */
+.notification-item:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+/* General reset for spacing and text */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f4f7fc;
+  color: #333;
+  line-height: 1.5;
+}
+
+/* Minimalist styling for the container */
+.analytics-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.analytics-container h4 {
+  font-size: 1.4rem;
+  margin-bottom: 15px;
+  color: #333;
+  font-weight: bold;
+}
+
+/* Carousel */
+.health-carousel {
+  border-radius: 8px;
+  padding: 20px;
+  background: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out;
+}
+
+.health-carousel:hover {
+  transform: scale(1.02);
+}
+
+.carousel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.carousel-header h3 {
+  font-size: 1.5rem;
+  color: #333;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+}
+
+.carousel-header .carousel-nav {
+  display: flex;
+  align-items: center;
+}
+
+.carousel-nav button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #007bff;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.carousel-nav button:hover {
+  color: #0056b3;
+}
+
+.carousel-nav span {
+  margin: 0 15px;
+  font-size: 1rem;
+  color: #666;
+}
+
+/* Graphs and Vital Stats */
+.vitals-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-top: 15px;
+}
+
+.vital-item {
+  background: #fff;
+  border-radius: 10px;
+  padding: 1.2rem;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.vital-item:hover {
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+  transform: translateY(-5px);
+}
+
+.vital-item span {
+  font-size: 2rem;
+  font-weight: 600;
+  display: block;
+}
+
+.vital-item small {
+  font-size: 0.9rem;
+  color: #888;
+  margin-top: 8px;
+}
+
+/* Dynamic Colors */
+.vital-item.bp {
+  background: #e0f7fa;
+}
+
+.vital-item.hr {
+  background: #ffeb3b;
+}
+
+.vital-item.temp {
+  background: #a5d6a7;
+}
+
+.vital-item.glucose {
+  background: #ef9a9a;
+}
+
+.mood-scale input[type="range"] {
+  width: 80%;
+  margin: 20px auto;
+  -webkit-appearance: none;
+  height: 8px;
+  border-radius: 5px;
+  background: linear-gradient(to right, #28a745 0%, #f8b400 50%, #dc3545 100%);
+  transition: all 0.3s ease;
+}
+
+.mood-scale input[type="range"]:focus {
+  outline: none;
+}
+
+.mood-scale input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #007bff;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.mood-scale input[type="range"]:focus::-webkit-slider-thumb {
+  transform: scale(1.2);
+}
+
+.mood-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1rem;
+  margin-top: 5px;
+}
+
+.mood-pill {
+  padding: 0.6rem 1.2rem;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 25px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.mood-pill:hover {
+  background-color: #0056b3;
+}
+
+.mood-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.mood-pill:focus {
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.6);
+}
+
+/* Notes Input Styling */
+.notes-input {
+  width: 100%;
+  height: 160px;
+  padding: 12px;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fafafa;
+  color: #333;
+  transition: all 0.3s ease;
+}
+
+.notes-input:focus {
+  border-color: #007bff;
+  background-color: #fff;
+  outline: none;
+}
+
+/* Goal Tracker */
+.goal-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background-color: #fff;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.goal-item:hover {
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+  transform: translateY(-5px);
+}
+
+.goal-item span {
+  font-size: 1.1rem;
+}
+
+.goal-progress {
+  display: flex;
+  gap: 10px;
+}
+
+.goal-check {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #ccc;
+}
+
+.goal-check.checked {
+  background-color: #28a745;
+}
+
+.goal-stats {
+  font-size: 1.1rem;
+  color: #007bff;
+}
+
+/* Tooltip on hover for additional information */
+.vital-item:hover::after {
+  content: "Tap to see more info";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  font-size: 0.9rem;
+  border-radius: 5px;
+}
+/* General Styles */
+.doctor-card {
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.health-carousel {
+  display: flex;
+  flex-direction: column;
+}
+
+.carousel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.carousel-header h3 {
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.carousel-nav {
+  display: flex;
+  align-items: center;
+}
+
+.carousel-nav button {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: #007bff;
+  cursor: pointer;
+  margin: 0 10px;
+}
+
+.carousel-nav button:hover {
+  opacity: 0.8;
+}
+
+.carousel-nav span {
+  font-size: 1rem;
+  color: #555;
+}
+
+.carousel-content {
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.mood-tracker, .vitals-grid, .reminders-list, .health-tips, .goals-tracker, .analytics-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Health Insights */
+.vitals-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.vital-item {
+  text-align: center;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: #f1f1f1;
+  font-size: 1.2rem;
+}
+
+.vital-item span {
+  font-weight: bold;
+}
+
+.vital-item small {
+  display: block;
+  font-size: 0.8rem;
+}
+
+.vital-item.bp.good {
+  background-color: #d4edda;
+}
+
+.vital-item.hr.warning {
+  background-color: #fff3cd;
+}
+
+.vital-item.temp.good {
+  background-color: #d4edda;
+}
+
+.vital-item.glucose.critical {
+  background-color: #f8d7da;
+}
+
+/* Mood Tracker */
+.mood-scale input[type="range"] {
+  width: 100%;
+}
+
+.mood-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.mood-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.mood-pill {
+  padding: 5px 15px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.mood-pill:hover {
+  background: #0056b3;
+}
+
+/* Reminders */
+.reminders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.reminder-item {
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Health Tips */
+.health-tips {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tip-card {
+  padding: 15px;
+  background-color: #e2e6ea;
+  border-radius: 8px;
+  font-size: 1rem;
+  text-align: center;
+}
+
+/* Goals Tracker */
+.goals-tracker {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.goal-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.goal-progress, .goal-stats {
+  display: flex;
+  align-items: center;
+}
+
+.goal-check {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background-color: #28a745;
+  margin-left: 5px;
+}
+
+.goal-check.checked {
+  background-color: #007bff;
+}
+
+/* Health Data Analytics */
+.analytics-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+h4 {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+}
+
+/* Recharts */
+.recharts-wrapper {
+  width: 100%;
+  height: 200px;
+}
+
+.recharts-wrapper .recharts-line-chart,
+.recharts-wrapper .recharts-radial-bar-chart {
+  margin-bottom: 20px;
+}
