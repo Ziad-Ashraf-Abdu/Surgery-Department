@@ -16,7 +16,10 @@ import { styled } from '@mui/material/styles';
 import ForgotPassword from './ForgotPassword';
 import AppTheme from './theme/AppTheme';
 import ColorModeSelect from './theme/ColorModeSelect';
-import {LogoIcon} from "./CustomIcons";
+import { LogoIcon } from './CustomIcons';
+import { useNavigate } from 'react-router-dom';
+
+import { patientUser, doctorUser } from "../../data/sampleData";
 
 const Card = styled(MuiCard)(({ theme }) => ({
     display: 'flex',
@@ -60,12 +63,13 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
     },
 }));
 
-export default function SignIn(props: { disableCustomTheme?: boolean }) {
+export default function SignIn(props) {
     const [idError, setIdError] = React.useState(false);
     const [idErrorMessage, setIdErrorMessage] = React.useState('');
     const [passwordError, setPasswordError] = React.useState(false);
     const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
     const [open, setOpen] = React.useState(false);
+    const navigate = useNavigate();
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -75,25 +79,46 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
         setOpen(false);
     };
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleClickSignUp = () => {
+        navigate('/sign up');
+    };
+
+    const handleSubmit = async (event) => {
         if (idError || passwordError) {
             event.preventDefault();
             return;
         }
         const data = new FormData(event.currentTarget);
-        console.log({
+        const toSend = {
             id: data.get('id'),
             password: data.get('password'),
+        };
+        const response = await fetch("",{
+            method: 'POST',
+            body: JSON.stringify(toSend),
         });
+        const result = await response.json();
+        if (response.ok) {
+            if (result.role === "patient") {
+                navigate('/patient home page', {state: {patientUser: result}});
+            }
+            else {
+                navigate('/doctor home page', {state: {doctorUser: result}});
+            }
+        }
+        else{
+            setIdErrorMessage('Wrong ID or password');
+            setPasswordErrorMessage('Wrong ID or password');
+        }
     };
 
     const validateInputs = () => {
-        const id = document.getElementById('id') as HTMLInputElement;
-        const password = document.getElementById('password') as HTMLInputElement;
+        const id = document.getElementById('id');
+        const password = document.getElementById('password');
 
         let isValid = true;
 
-        if (!id.value ) {
+        if (!id.value) {
             setIdError(true);
             setIdErrorMessage('Please enter a valid ID.');
             isValid = false;
@@ -187,7 +212,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
                             sx={{
                                 '&:hover': {
                                     backgroundColor: '#3D90D7',
-                                }
+                                },
                             }}
                         >
                             Sign in
@@ -205,12 +230,10 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
                     </Box>
                     <Divider>or</Divider>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-
-                        
                         <Typography sx={{ textAlign: 'center' }}>
                             Don&apos;t have an account?{' '}
                             <Link
-                                href="/material-ui/getting-started/templates/sign-in/"
+                                onClick={handleClickSignUp}
                                 variant="body2"
                                 sx={{ alignSelf: 'center' }}
                                 color={'#3D90D7'}

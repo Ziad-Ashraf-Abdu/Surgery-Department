@@ -4,8 +4,11 @@ import "./gen/doctorHP.css";
 import ProfileHeader from "./Header";
 import DoctorProfile from "./gen/ProfileInfo";
 import Panel from "./gen/Panel";
+import {useLocation} from "react-router-dom";
 
-export default function DoctorHP({ user }) {
+export default function DoctorHP() {
+  const location = useLocation();
+  const user = location.state.doctorUser;
   const [activeTab, setActiveTab] = useState("Dashboard");
   const [selectedNotification, setSelectedNotification] = useState(null);
 
@@ -46,134 +49,134 @@ export default function DoctorHP({ user }) {
   };
 
   return (
-    <div className="doctor-hp-container">
-      <ProfileHeader
-        user={user}
-        role="doctor"
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        actions={actions}
-        onAction={name => console.log("Doctor action:", name)}
-      />
+      <div className="doctor-hp-container">
+        <ProfileHeader
+            user={user}
+            role="doctor"
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            actions={actions}
+            onAction={name => console.log("Doctor action:", name)}
+        />
 
-      {/* Notification Modal */}
-      {selectedNotification && (
-        <div className="notification-modal-overlay" onClick={closeNotificationModal}>
-          <div className="notification-modal" onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close-btn" onClick={closeNotificationModal}>
-              &times;
-            </button>
-            <h3>Notification Details</h3>
-            <div className="modal-content">
-              <p><strong>Message:</strong> {selectedNotification.message}</p>
-              <p><strong>Received:</strong> {selectedNotification.timestamp}</p>
-              <p><strong>Priority:</strong> <span className="priority-tag">{selectedNotification.priority}</span></p>
+        {/* Notification Modal */}
+        {selectedNotification && (
+            <div className="notification-modal-overlay" onClick={closeNotificationModal}>
+              <div className="notification-modal" onClick={(e) => e.stopPropagation()}>
+                <button className="modal-close-btn" onClick={closeNotificationModal}>
+                  &times;
+                </button>
+                <h3>Notification Details</h3>
+                <div className="modal-content">
+                  <p><strong>Message:</strong> {selectedNotification.message}</p>
+                  <p><strong>Received:</strong> {selectedNotification.timestamp}</p>
+                  <p><strong>Priority:</strong> <span className="priority-tag">{selectedNotification.priority}</span></p>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+        )}
 
-      {/* Dashboard Content */}
-      {activeTab === "Dashboard" && (
-        <div className="main-grid">
-          <DoctorProfile />
+        {/* Dashboard Content */}
+        {activeTab === "Dashboard" && (
+            <div className="main-grid">
+              <DoctorProfile />
 
-          <div className="panel-group">
-            <Panel
-              title="Today’s Schedule"
-              items={user.todaySchedule}
-              className="schedule-list"
-              renderItem={it => (
-                <>
-                  <span className="time-badge">🕒 {it.time}</span>
-                  <span className="patient-name">{it.patient}</span>
-                  <span className="status-indicator">●</span>
-                </>
-              )}
-            />
+              <div className="panel-group">
+                <Panel
+                    title="Today’s Schedule"
+                    items={user.todaySchedule}
+                    className="schedule-list"
+                    renderItem={it => (
+                        <>
+                          <span className="time-badge">🕒 {it.time}</span>
+                          <span className="patient-name">{it.patient}</span>
+                          <span className="status-indicator">●</span>
+                        </>
+                    )}
+                />
 
-            <Panel
-              title="Surgeries This Week"
-              items={user.surgeriesThisWeek}
-              className="surgery-list"
-              renderItem={s => (
-                <>
-                  <div className="surgery-time">
-                    <span className="icon">🏥</span>
-                    {formatDateTime(s.date, s.time)}
-                  </div>
-                  <div className="surgery-details">
-                    <span className="procedure">{s.procedure}</span>
-                    <span className="room-tag">OR {s.room}</span>
-                  </div>
-                </>
-              )}
-            />
+                <Panel
+                    title="Surgeries This Week"
+                    items={user.surgeriesThisWeek}
+                    className="surgery-list"
+                    renderItem={s => (
+                        <>
+                          <div className="surgery-time">
+                            <span className="icon">🏥</span>
+                            {formatDateTime(s.date, s.time)}
+                          </div>
+                          <div className="surgery-details">
+                            <span className="procedure">{s.procedure}</span>
+                            <span className="room-tag">OR {s.room}</span>
+                          </div>
+                        </>
+                    )}
+                />
 
-            <Panel
-              title="Patients & Metrics"
-              items={metricsItems}
-              className="metrics-list"
-              renderItem={m => (
-                <div className="metric-item">
-                  <span className="metric-icon">{m.icon}</span>
-                  <div className="metric-info">
-                    <span className="metric-label">{m.label}</span>
-                    <span className="metric-value">{m.value}</span>
-                  </div>
-                </div>
-              )}
-            />
+                <Panel
+                    title="Patients & Metrics"
+                    items={metricsItems}
+                    className="metrics-list"
+                    renderItem={m => (
+                        <div className="metric-item">
+                          <span className="metric-icon">{m.icon}</span>
+                          <div className="metric-info">
+                            <span className="metric-label">{m.label}</span>
+                            <span className="metric-value">{m.value}</span>
+                          </div>
+                        </div>
+                    )}
+                />
 
-            <Panel
-              title="On-Call Schedule"
-              items={user.onCallSchedule}
-              className="oncall-list"
-              renderItem={o => (
-                <>
-                  <span className="date-pill">{o.date}</span>
-                  <span className="shift-details">{o.shift}</span>
-                  <span className="urgency-indicator">{o.urgent ? "🚨" : "🟢"}</span>
-                </>
-              )}
-            />
+                <Panel
+                    title="On-Call Schedule"
+                    items={user.onCallSchedule}
+                    className="oncall-list"
+                    renderItem={o => (
+                        <>
+                          <span className="date-pill">{o.date}</span>
+                          <span className="shift-details">{o.shift}</span>
+                          <span className="urgency-indicator">{o.urgent ? "🚨" : "🟢"}</span>
+                        </>
+                    )}
+                />
 
-            <Panel
-              title="Notifications"
-              items={user.notifications}
-              className="notifications-list"
-              renderItem={n => (
-                <div
-                  className="notification-item"
-                  onClick={() => handleNotificationClick(n)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyPress={(e) => e.key === 'Enter' && handleNotificationClick(n)}
-                >
-                  <span className="alert-icon">⚠️</span>
-                  <span className="notification-text">{n}</span>
-                </div>
-              )}
-            />
-          </div>
-        </div>
-      )}
+                <Panel
+                    title="Notifications"
+                    items={user.notifications}
+                    className="notifications-list"
+                    renderItem={n => (
+                        <div
+                            className="notification-item"
+                            onClick={() => handleNotificationClick(n)}
+                            role="button"
+                            tabIndex={0}
+                            onKeyPress={(e) => e.key === 'Enter' && handleNotificationClick(n)}
+                        >
+                          <span className="alert-icon">⚠️</span>
+                          <span className="notification-text">{n}</span>
+                        </div>
+                    )}
+                />
+              </div>
+            </div>
+        )}
 
-      {/* Patients Tab */}
-      {activeTab === "Patients" && (
-        <div className="doctor-card">
-          <h3>All Patients</h3>
-          <p>(Implement your patients list here…)</p>
-        </div>
-      )}
+        {/* Patients Tab */}
+        {activeTab === "Patients" && (
+            <div className="doctor-card">
+              <h3>All Patients</h3>
+              <p>(Implement your patients list here…)</p>
+            </div>
+        )}
 
-      {/* Messages Tab */}
-      {activeTab === "Messages" && (
-        <div className="doctor-card">
-          <h3>Messages</h3>
-          <p>(Implement your messaging UI here…)</p>
-        </div>
-      )}
-    </div>
+        {/* Messages Tab */}
+        {activeTab === "Messages" && (
+            <div className="doctor-card">
+              <h3>Messages</h3>
+              <p>(Implement your messaging UI here…)</p>
+            </div>
+        )}
+      </div>
   );
 }
