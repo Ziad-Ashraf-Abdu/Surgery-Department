@@ -5,8 +5,11 @@ import { FaCalendarAlt, FaUserMd, FaCapsules } from "react-icons/fa";
 import Header from "./Header";
 import ProfileInfo from "./gen/ProfileInfo";
 import EditModal from "./gen/EditModal";
+import {useLocation} from "react-router-dom";
 
-export default function PatientHP({ user }) {
+export default function PatientHP() {
+  const location = useLocation();
+  const user = location.state.patientUser;
   const [photo, setPhoto] = useState(user.photo);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
