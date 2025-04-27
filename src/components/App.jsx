@@ -9,9 +9,9 @@ export default function App() {
     <div>
       {/* Pass data via props */}
       {/*<PatientHP user={patientUser} />*/}
-        <SignIn/>
+{/*         <SignIn/> */}
       <div className="h-12" />
-{/*       <DoctorHP user={doctorUser} /> */}
+      <DoctorHP user={doctorUser} />
     </div>
   );
 }
