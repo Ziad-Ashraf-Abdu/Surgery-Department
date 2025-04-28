@@ -1,13 +1,13 @@
-// src/components/Panel.jsx
+// src/components/gen/Panel.jsx
 import React from 'react';
+import PropTypes from 'prop-types';
 
-/**
- * @param {string}       title       — Panel heading
- * @param {Array}        items       — Array of data objects
- * @param {string}       className   — CSS class for the <ul>
- * @param {Function}     renderItem  — (item) ⇒ JSX to render each <li>
- */
-export default function Panel({ title, items, className, renderItem }) {
+export default function Panel({
+  title,
+  items = [],
+  className = '',
+  renderItem
+}) {
   return (
     <div className="doctor-card">
       <h3>{title}</h3>
@@ -19,3 +19,10 @@ export default function Panel({ title, items, className, renderItem }) {
     </div>
   );
 }
+
+Panel.propTypes = {
+  title: PropTypes.string.isRequired,
+  items: PropTypes.array,
+  className: PropTypes.string,
+  renderItem: PropTypes.func.isRequired
+};

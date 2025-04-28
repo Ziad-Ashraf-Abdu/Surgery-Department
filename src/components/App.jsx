@@ -17,9 +17,11 @@ export default function App() {
       <BrowserRouter>
           <Routes>
               <Route path="/" element={<SignIn />} />
-              <Route path="/sign up" element={<SignUp />} />
-              <Route path="/doctor home page" element={<DoctorHP />} />
-              <Route path="/patient home page" element={<PatientHP />} />
+              <Route path="/sign-up" element={<SignUp />} />
+              <Route path="/doctor-home-page" element={<DoctorHP />} />
+              <Route path="/patient-home-page" element={<PatientHP />} />
+              {/* Fallback for unmatched routes */}
+              <Route path="*" element={<div>Page Not Found</div>} />
           </Routes>
       </BrowserRouter>
   );

@@ -80,37 +80,52 @@ export default function SignIn(props) {
     };
 
     const handleClickSignUp = () => {
-        navigate('/sign up');
+        navigate('/sign-up');
     };
 
     const handleSubmit = async (event) => {
-        if (idError || passwordError) {
-            event.preventDefault();
-            return;
-        }
-        const data = new FormData(event.currentTarget);
-        const toSend = {
-            id: data.get('id'),
-            password: data.get('password'),
-        };
-        const response = await fetch("",{
-            method: 'POST',
-            body: JSON.stringify(toSend),
+      event.preventDefault();
+      if (!validateInputs()) return;
+
+      const form = new FormData(event.currentTarget);
+      const payload = {
+        email:    form.get('id'),
+        password: form.get('password'),
+      };
+
+      try {
+        const res = await fetch("http://127.0.0.1:8000/api/login/", {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
         });
-        const result = await response.json();
-        if (response.ok) {
-            if (result.role === "patient") {
-                navigate('/patient home page', {state: {patientUser: result}});
-            }
-            else {
-                navigate('/doctor home page', {state: {doctorUser: result}});
-            }
+        const json = await res.json();
+
+        if (res.ok) {
+          // json = { role: "patient"|"doctor", user: { ...fields... } }
+          if (json.role === 'patient') {
+            navigate('/patient-home-page', { state: { patientUser: json.user } });
+          } else {
+            navigate('/doctor-home-page', { state: { doctorUser: json.user } });
+          }
+        } else {
+          // 400 or 401
+          const msg = json.detail || 'Wrong email or password';
+          setIdErrorMessage(msg);
+          setPasswordErrorMessage(msg);
+          setIdError(true);
+          setPasswordError(true);
         }
-        else{
-            setIdErrorMessage('Wrong ID or password');
-            setPasswordErrorMessage('Wrong ID or password');
-        }
+      } catch (err) {
+        console.error(err);
+        const msg = 'Network error, please try again';
+        setIdErrorMessage(msg);
+        setPasswordErrorMessage(msg);
+        setIdError(true);
+        setPasswordError(true);
+      }
     };
+
 
     const validateInputs = () => {
         const id = document.getElementById('id');
