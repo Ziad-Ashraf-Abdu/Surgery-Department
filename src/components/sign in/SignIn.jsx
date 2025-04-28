@@ -47,6 +47,7 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
     [theme.breakpoints.up('sm')]: {
         padding: theme.spacing(4),
     },
+    backgroundColor: "#B5FCCD",
     '&::before': {
         content: '""',
         display: 'block',

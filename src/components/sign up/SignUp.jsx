@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
 import CssBaseline from '@mui/material/CssBaseline';
 import Divider from '@mui/material/Divider';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -13,11 +12,11 @@ import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
+import {FormHelperText, RadioGroup, Radio } from '@mui/material';
 import AppTheme from '../sign in/theme/AppTheme';
 import ColorModeSelect from '../sign in/theme/ColorModeSelect';
-import { LogoIcon } from '../sign in/CustomIcons'
+import { LogoIcon } from '../sign in/CustomIcons';
 import { useNavigate } from "react-router-dom";
-import { patientUser } from "../../data/sampleData";
 
 const Card = styled(MuiCard)(({ theme }) => ({
     display: 'flex',
@@ -82,6 +81,10 @@ export default function SignUp(props) {
     const [addressError, setAddressError] = useState(false);
     const [addressErrorMessage, setAddressErrorMessage] = useState('');
 
+    const [genderError, setGenderError] = useState(false);
+    const [genderErrorMessage, setGenderErrorMessage] = useState('');
+
+
     const navigate = useNavigate();
 
     const handleClickSignIn = () => {
@@ -95,6 +98,7 @@ export default function SignUp(props) {
         const primaryMobileNo = document.getElementById('primaryMobileNo');
         const secondryMobileNo = document.getElementById('secondryMobileNo');
         const address = document.getElementById('address');
+        const gender = document.querySelector('input[name="gender"]:checked');
 
         let isValid = true;
 
@@ -125,7 +129,7 @@ export default function SignUp(props) {
             setNameErrorMessage('');
         }
 
-        if (!primaryMobileNo.value || !/^[0-9]{10}$/.test(primaryMobileNo.value)) {
+        if (!primaryMobileNo.value || !/^[0-9]{10,}$/.test(primaryMobileNo.value)) {
             setPrimaryMobileNoError(true);
             setPrimaryMobileNoErrorMessage('Mobile number must be at least 10 digits long.');
             isValid = false;
@@ -138,7 +142,7 @@ export default function SignUp(props) {
             setSecondryMobileNoErrorMessage('Mobile number must be at least 10 digits long.');
             isValid = false;
         } else {
-            setAddressErrorMessage(false);
+            setSecondryMobileNoError(false);
             setSecondryMobileNoErrorMessage('');
         }
         if (!address.value || address.value.length < 1) {
@@ -149,15 +153,82 @@ export default function SignUp(props) {
             setAddressError(false);
             setAddressErrorMessage('');
         }
-
+        if (!gender) {
+            setGenderError(true);
+            setGenderErrorMessage('Please select a gender.');
+            isValid = false;
+        } else {
+            setGenderError(false);
+            setGenderErrorMessage('');
+        }
 
         return isValid;
     };
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        if (validateInputs()) {
-            navigate("/patient home page", { state: { patientUser } });
+        if (!validateInputs()) return;
+
+        const formData = new FormData(event.target);
+        const buttonClicked = event.nativeEvent.submitter.value;
+
+        const payload = {
+            name: formData.get('name'),
+            email: formData.get('email'),
+            password: formData.get('password'),
+            primaryMobileNo: formData.get('primaryMobileNo'),
+            secondryMobileNo: formData.get('secondryMobileNo'),
+            address: formData.get('address'),
+            gender: formData.get('gender'),
+        };
+        if (buttonClicked === "doctor") {
+            try {
+                const response = await fetch('doctor url', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload),
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    navigate("/doctor-home-page", {state: {doctorUser: result}});
+                } else {
+                    const errorData = await response.json();
+                    setNameErrorMessage(errorData);
+                    console.error('Error:', errorData);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                const msg = 'Network error, please try again';
+                setNameErrorMessage(msg);
+            }
+
+        } else if (buttonClicked === "patient") {
+            try {
+                const response = await fetch('patient URl', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload),
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    navigate("/patient-home-page", {state: {patientUser: result}});
+                } else {
+                    const errorData = await response.json();
+                    setNameErrorMessage(errorData);
+                    console.error('Error:', errorData);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                const msg = 'Network error, please try again';
+                setNameErrorMessage(msg);
+            }
+
         }
     };
 
@@ -267,9 +338,19 @@ export default function SignUp(props) {
                                 color={addressError ? 'error' : 'primary'}
                             />
                         </FormControl>
+                        <FormControl error={genderError}>
+                            <FormLabel>Gender</FormLabel>
+                            <RadioGroup name="gender" row>
+                                <FormControlLabel value="male" control={<Radio />} label="Male" />
+                                <FormControlLabel value="female" control={<Radio />} label="Female" />
+                            </RadioGroup>
+                            {genderError && <FormHelperText>{genderErrorMessage}</FormHelperText>}
+                        </FormControl>
 
                         <Button
                             type="submit"
+                            name="submitButton"
+                            value="doctor"
                             fullWidth
                             variant="contained"
                             sx={{
@@ -278,7 +359,21 @@ export default function SignUp(props) {
                                 }
                             }}
                         >
-                            Sign up
+                        Sign up as a doctor
+                        </Button>
+                        <Button
+                            type="submit"
+                            name="submitButton"
+                            value="patient"
+                            fullWidth
+                            variant="contained"
+                            sx={{
+                                '&:hover': {
+                                    backgroundColor: '#3D90D7',
+                                }
+                            }}
+                        >
+                            Sign up as a patient
                         </Button>
                     </Box>
                     <Divider>
