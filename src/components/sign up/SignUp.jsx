@@ -15,7 +15,7 @@ import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
 import AppTheme from '../sign in/theme/AppTheme';
 import ColorModeSelect from '../sign in/theme/ColorModeSelect';
-import { LogoIcon } from '../sign in/CustomIcons';
+import { LogoIcon } from '../sign in/CustomIcons'
 import { useNavigate } from "react-router-dom";
 import { patientUser } from "../../data/sampleData";
 
@@ -32,6 +32,7 @@ const Card = styled(MuiCard)(({ theme }) => ({
     [theme.breakpoints.up('sm')]: {
         width: '450px',
     },
+    overflow: 'auto',
     ...theme.applyStyles('dark', {
         boxShadow:
             'hsla(220, 30%, 5%, 0.5) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.08) 0px 15px 35px -5px',
@@ -42,6 +43,7 @@ const SignUpContainer = styled(Stack)(({ theme }) => ({
     height: 'calc((1 - var(--template-frame-height, 0)) * 100dvh)',
     minHeight: '100%',
     padding: theme.spacing(2),
+    backgroundColor: "#7AC6D2",
     [theme.breakpoints.up('sm')]: {
         padding: theme.spacing(4),
     },
@@ -64,10 +66,22 @@ const SignUpContainer = styled(Stack)(({ theme }) => ({
 export default function SignUp(props) {
     const [emailError, setEmailError] = useState(false);
     const [emailErrorMessage, setEmailErrorMessage] = useState('');
+
     const [passwordError, setPasswordError] = useState(false);
     const [passwordErrorMessage, setPasswordErrorMessage] = useState('');
+
     const [nameError, setNameError] = useState(false);
     const [nameErrorMessage, setNameErrorMessage] = useState('');
+
+    const [primaryMobileNoError, setPrimaryMobileNoError] = useState(false);
+    const [primaryMobileNoErrorMessage, setPrimaryMobileNoErrorMessage] = useState('');
+
+    const [secondryMobileNoError, setSecondryMobileNoError] = useState(false);
+    const [secondryMobileNoErrorMessage, setSecondryMobileNoErrorMessage] = useState('');
+
+    const [addressError, setAddressError] = useState(false);
+    const [addressErrorMessage, setAddressErrorMessage] = useState('');
+
     const navigate = useNavigate();
 
     const handleClickSignIn = () => {
@@ -78,6 +92,9 @@ export default function SignUp(props) {
         const email = document.getElementById('email');
         const password = document.getElementById('password');
         const name = document.getElementById('name');
+        const primaryMobileNo = document.getElementById('primaryMobileNo');
+        const secondryMobileNo = document.getElementById('secondryMobileNo');
+        const address = document.getElementById('address');
 
         let isValid = true;
 
@@ -108,6 +125,32 @@ export default function SignUp(props) {
             setNameErrorMessage('');
         }
 
+        if (!primaryMobileNo.value || !/^[0-9]{10}$/.test(primaryMobileNo.value)) {
+            setPrimaryMobileNoError(true);
+            setPrimaryMobileNoErrorMessage('Mobile number must be at least 10 digits long.');
+            isValid = false;
+        } else {
+            setPrimaryMobileNoError(false);
+            setPrimaryMobileNoErrorMessage('');
+        }
+        if (secondryMobileNo.value && !/^[0-9]{10}$/.test(secondryMobileNo.value)) {
+            setSecondryMobileNoError(true);
+            setSecondryMobileNoErrorMessage('Mobile number must be at least 10 digits long.');
+            isValid = false;
+        } else {
+            setAddressErrorMessage(false);
+            setSecondryMobileNoErrorMessage('');
+        }
+        if (!address.value || address.value.length < 1) {
+            setAddressError(true);
+            setAddressErrorMessage('Address is required.');
+            isValid = false;
+        } else {
+            setAddressError(false);
+            setAddressErrorMessage('');
+        }
+
+
         return isValid;
     };
 
@@ -121,23 +164,24 @@ export default function SignUp(props) {
     return (
         <AppTheme {...props}>
             <CssBaseline enableColorScheme />
-            <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
             <SignUpContainer direction="column" justifyContent="space-between">
+                <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
                 <Card variant="outlined">
-                    <LogoIcon />
-                    <Typography
-                        component="h1"
-                        variant="h4"
-                        sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
-                        color={'#3A59D1'}
-                    >
-                        Sign up
-                    </Typography>
+
                     <Box
                         component="form"
                         onSubmit={handleSubmit}
                         sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
                     >
+                        <LogoIcon style={{ border: '2px solid red' }} />
+                        <Typography
+                            component="h1"
+                            variant="h4"
+                            sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
+                            color={'#3A59D1'}
+                        >
+                            Sign up
+                        </Typography>
                         <FormControl>
                             <FormLabel htmlFor="name">Full name</FormLabel>
                             <TextField
@@ -146,7 +190,7 @@ export default function SignUp(props) {
                                 required
                                 fullWidth
                                 id="name"
-                                placeholder="Jon Snow"
+                                placeholder="Your name"
                                 error={nameError}
                                 helperText={nameErrorMessage}
                                 color={nameError ? 'error' : 'primary'}
@@ -181,6 +225,46 @@ export default function SignUp(props) {
                                 error={passwordError}
                                 helperText={passwordErrorMessage}
                                 color={passwordError ? 'error' : 'primary'}
+                            />
+                        </FormControl>
+                        <FormControl>
+                            <FormLabel htmlFor="primaryMobileNo">Primary mobile number</FormLabel>
+                            <TextField
+                                autoComplete="primaryMobileNo"
+                                name="primaryMobileNo"
+                                required
+                                fullWidth
+                                id="primaryMobileNo"
+                                placeholder="primary mobile number"
+                                error={primaryMobileNoError}
+                                helperText={primaryMobileNoErrorMessage}
+                                color={primaryMobileNoError ? 'error' : 'primary'}
+                            />
+                        </FormControl>
+                        <FormControl>
+                            <FormLabel htmlFor="secondryMobileNo">Secondry mobile number</FormLabel>
+                            <TextField
+                                autoComplete="secondryMobileNo"
+                                name="secondryMobileNo"
+                                fullWidth
+                                id="secondryMobileNo"
+                                placeholder="Secondry mobile number"
+                                error={secondryMobileNoError}
+                                helperText={secondryMobileNoErrorMessage}
+                                color={secondryMobileNoError ? 'error' : 'primary'}
+                            />
+                        </FormControl>
+                        <FormControl>
+                            <FormLabel htmlFor="address">Address</FormLabel>
+                            <TextField
+                                name="address"
+                                required
+                                fullWidth
+                                id="address"
+                                placeholder="Address"
+                                error={addressError}
+                                helperText={addressErrorMessage}
+                                color={addressError ? 'error' : 'primary'}
                             />
                         </FormControl>
 
