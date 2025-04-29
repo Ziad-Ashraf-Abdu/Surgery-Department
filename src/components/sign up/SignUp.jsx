@@ -181,9 +181,14 @@ export default function SignUp(props) {
             address: formData.get('address'),
             gender: formData.get('gender'),
         };
+
+        // Define proper URLs
+        const doctorUrl = 'http://127.0.0.1:8000/api/doctors/';
+        const patientUrl = 'http://127.0.0.1:8000/api/patients/';
+
         if (buttonClicked === "doctor") {
             try {
-                const response = await fetch('doctor url', {
+                const response = await fetch(doctorUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -193,7 +198,7 @@ export default function SignUp(props) {
 
                 if (response.ok) {
                     const result = await response.json();
-                    navigate("/doctor-home-page", {state: {doctorUser: result}});
+                    navigate("/doctor-home-page", { state: { doctorUser: result } });
                 } else {
                     const errorData = await response.json();
                     setNameErrorMessage(errorData);
@@ -201,13 +206,11 @@ export default function SignUp(props) {
                 }
             } catch (error) {
                 console.error('Error:', error);
-                const msg = 'Network error, please try again';
-                setNameErrorMessage(msg);
+                setNameErrorMessage('Network error, please try again');
             }
-
         } else if (buttonClicked === "patient") {
             try {
-                const response = await fetch('patient URl', {
+                const response = await fetch(patientUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -217,7 +220,7 @@ export default function SignUp(props) {
 
                 if (response.ok) {
                     const result = await response.json();
-                    navigate("/patient-home-page", {state: {patientUser: result}});
+                    navigate("/patient-home-page", { state: { patientUser: result } });
                 } else {
                     const errorData = await response.json();
                     setNameErrorMessage(errorData);
@@ -225,12 +228,11 @@ export default function SignUp(props) {
                 }
             } catch (error) {
                 console.error('Error:', error);
-                const msg = 'Network error, please try again';
-                setNameErrorMessage(msg);
+                setNameErrorMessage('Network error, please try again');
             }
-
         }
     };
+
 
     return (
         <AppTheme {...props}>

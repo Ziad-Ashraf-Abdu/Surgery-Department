@@ -19,7 +19,7 @@ import ColorModeSelect from './theme/ColorModeSelect';
 import { LogoIcon } from './CustomIcons';
 import { useNavigate } from 'react-router-dom';
 
-import { patientUser, doctorUser } from "../../data/sampleData";
+//import { patientUser, doctorUser } from "../../data/sampleData";
 
 const Card = styled(MuiCard)(({ theme }) => ({
     display: 'flex',

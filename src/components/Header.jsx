@@ -1,6 +1,8 @@
 // src/components/ProfileHeader.jsx
 import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
+import ProfileCompletionIndicator from './gen/ProfileCompletionIndicator';
+import {getTabIcon, calculateAge, calculateCompletion} from './gen/helperFunctions';
 import './gen/doctorHP.css';
 
 // Vite env vars for Cloudinary
@@ -10,18 +12,6 @@ const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
 // configure your API base URL
 axios.defaults.baseURL = 'http://127.0.0.1:8000/api';
 
-// Helper to calculate age from DOB (YYYY-MM-DD)
-const calculateAge = dob => {
-  if (!dob) return '';
-  const birth = new Date(dob);
-  const now = new Date();
-  let age = now.getFullYear() - birth.getFullYear();
-  const m = now.getMonth() - birth.getMonth();
-  if (m < 0 || (m === 0 && now.getDate() < birth.getDate())) {
-    age--;
-  }
-  return age;
-};
 
 export default function ProfileHeader({
                                         user,
@@ -54,7 +44,6 @@ export default function ProfileHeader({
         }
       };
     } else {
-      // doctor
       return {
         id: user.id,
         name: user.name,
@@ -74,6 +63,9 @@ export default function ProfileHeader({
     }
   }, [user, role]);
 
+  // Compute completion percentage
+  const completionPercentage = calculateCompletion(normalized);
+
   // Local state
   const [photo, setPhoto] = useState(normalized.photo);
   const [photoUrl, setPhotoUrl] = useState('');
@@ -82,7 +74,7 @@ export default function ProfileHeader({
   const [isEditing, setIsEditing] = useState(false);
   const [edited, setEdited] = useState({ ...normalized });
 
-  // Reset when opening modal or user changes
+  // Reset state when modal opens or user data changes
   useEffect(() => {
     if (showModal) {
       setEdited({ ...normalized });
@@ -95,17 +87,15 @@ export default function ProfileHeader({
 
   const toggleModal = () => setShowModal(v => !v);
 
-  // Handle file → local preview → Cloudinary upload
+  // Photo upload handler
   const handlePhotoChangeModal = async e => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // local preview
     const reader = new FileReader();
     reader.onload = () => setPhoto(reader.result);
     reader.readAsDataURL(file);
 
-    // upload to Cloudinary
     setUploading(true);
     const formData = new FormData();
     formData.append('file', file);
@@ -128,14 +118,7 @@ export default function ProfileHeader({
     }
   };
 
-  // Handle manual URL input (if you allow it)
-  const handleUrlChange = e => {
-    const url = e.target.value;
-    setPhotoUrl(url);
-    setEdited(ed => ({ ...ed, photo: url }));
-  };
-
-  // Generic nested field updater
+  // Nested field updater
   const handleFieldChange = (path, value) => {
     setEdited(prev => {
       const copy = { ...prev };
@@ -150,7 +133,7 @@ export default function ProfileHeader({
     });
   };
 
-  // Save: remap photo → photo_url, then PATCH
+  // Save changes
   const saveChanges = async () => {
     if (uploading) {
       alert('Please wait for the image to finish uploading.');
@@ -162,7 +145,6 @@ export default function ProfileHeader({
             ? `/doctors/${normalized.id}/`
             : `/patients/${normalized.id}/`;
 
-    // Build payload and remap
     const payload = { ...edited };
     if (payload.photo) {
       payload.photo_url = payload.photo;
@@ -185,49 +167,63 @@ export default function ProfileHeader({
 
   return (
       <header className="doctor-header-container">
-        {/* Main Header */}
-        <div className="flex justify-between items-center mb-6">
-          <div className="profile-section cursor-pointer" onClick={toggleModal}>
-            <img src={photo || photoUrl} alt="Profile" className="profile-img" />
-            <div className="profile-details">
-              <h2 className="text-xl font-semibold">
-                {role === 'doctor' ? `Dr. ${edited.name}` : edited.name}
-              </h2>
-              <p className="text-sm">
-                ID: {normalized.id}
-                {role === 'doctor' && normalized.specialization && ` • ${normalized.specialization}`}
-              </p>
+        {/* Floating Reminder */}
+        {completionPercentage < 100 && (
+            <div className="floating-reminder">
+              <span className="reminder-icon">⚠️</span>
+              <strong>Profile Completion:</strong>
+              <span className="percentage">{completionPercentage}%</span>
+              <button onClick={toggleModal} className="update-btn">
+                Complete Profile
+              </button>
             </div>
+        )}
+        {/* Row 1: Profile picture & name */}
+        <div className="flex items-center cursor-pointer mb-4" onClick={toggleModal}>
+          <ProfileCompletionIndicator
+              percentage={completionPercentage}
+              photoUrl={photo || photoUrl}
+          />
+          <div className="ml-4 profile-details">
+            <h2 className="profile-name">
+              {role === 'doctor' ? `Dr. ${edited.name}` : edited.name}
+            </h2>
+            <p className="profile-info">
+              {"    "} ID: {normalized.id}
+            </p>
+            {/*<div className="status-badges">*/}
+            {/*  <span className="badge online-status">Online</span>*/}
+            {/*  <span className="badge appointment-count">3 Appts Today</span>*/}
+            {/*</div>*/}
           </div>
-          {actions.length > 0 && (
-              <div className="space-x-2">
-                {actions.map(a => (
-                    <button
-                        key={a.name}
-                        className="btn btn-secondary"
-                        onClick={() => onAction(a.name)}
-                    >
-                      {a.label}
-                    </button>
-                ))}
-              </div>
-          )}
         </div>
 
-        {/* Tabs */}
+        {/* Action Buttons */}
+        {actions.length > 0 && (
+            <div className="action-buttons">
+              {actions.map(a => (
+                  <button
+                      key={a.name}
+                      className="btn btn-secondary"
+                      onClick={() => onAction(a.name)}
+                  >
+                    {a.label}
+                  </button>
+              ))}
+            </div>
+        )}
+
+        {/* Enhanced Navigation Tabs */}
         {tabs.length > 0 && (
-            <nav className="mb-6">
-              <ul className="flex space-x-4 border-b">
+            <nav className="navigation-tabs">
+              <ul className="tab-list">
                 {tabs.map(tab => (
                     <li
                         key={tab}
                         onClick={() => onTabChange(tab)}
-                        className={`pb-2 cursor-pointer ${
-                            activeTab === tab
-                                ? 'border-b-2 border-green-600 font-medium text-gray-800'
-                                : 'text-gray-500 hover:text-gray-700'
-                        }`}
+                        className={`tab-item ${activeTab === tab ? 'active' : ''}`}
                     >
+                      <span className="tab-icon">{getTabIcon(tab)}</span>
                       {tab}
                     </li>
                 ))}
@@ -313,9 +309,7 @@ export default function ProfileHeader({
                       <div className="space-y-2">
                         {['age', 'gender', 'dob', 'bloodGroup', 'referredBy'].map(field => (
                             <div key={field}>
-                              <strong>
-                                {field.charAt(0).toUpperCase() + field.slice(1)}:
-                              </strong>{' '}
+                              <strong>{field.charAt(0).toUpperCase() + field.slice(1)}:</strong>{' '}
                               {isEditing ? (
                                   <input
                                       type="text"
@@ -339,9 +333,7 @@ export default function ProfileHeader({
                                   <input
                                       type="text"
                                       value={edited.contact[k]}
-                                      onChange={e =>
-                                          handleFieldChange(`contact.${k}`, e.target.value)
-                                      }
+                                      onChange={e => handleFieldChange(`contact.${k}`, e.target.value)}
                                       className="border-b border-gray-400 focus:outline-none"
                                   />
                               ) : (
@@ -357,16 +349,12 @@ export default function ProfileHeader({
                       <div className="space-y-2">
                         {['email', 'phone', 'office'].map(k => (
                             <div key={k}>
-                              <strong>
-                                {k.charAt(0).toUpperCase() + k.slice(1)}:
-                              </strong>{' '}
+                              <strong>{k.charAt(0).toUpperCase() + k.slice(1)}:</strong>{' '}
                               {isEditing ? (
                                   <input
                                       type="text"
                                       value={edited.contact[k]}
-                                      onChange={e =>
-                                          handleFieldChange(`contact.${k}`, e.target.value)
-                                      }
+                                      onChange={e => handleFieldChange(`contact.${k}`, e.target.value)}
                                       className="border-b border-gray-400 focus:outline-none"
                                   />
                               ) : (
@@ -386,7 +374,7 @@ export default function ProfileHeader({
                                   className="border-b border-gray-400 focus:outline-none"
                               />
                           ) : (
-                              `${normalized.yearsExperience} years`
+                              `${normalized.years_experience} years`
                           )}
                         </div>
                         <div>
