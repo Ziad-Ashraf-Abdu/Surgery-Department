@@ -4,7 +4,7 @@ import 'react-circular-progressbar/dist/styles.css';
 
 const ProfileCompletionIndicator = ({ percentage, photoUrl }) => {
     return (
-        <div style={{ width: 120, height: 120 }}>
+        <div style={{ width: 105, height: 105 }}>
             <CircularProgressbarWithChildren
                 value={percentage}
                 styles={buildStyles({
@@ -18,7 +18,7 @@ const ProfileCompletionIndicator = ({ percentage, photoUrl }) => {
                     style={{
                         width: 80,
                         height: 80,
-                        borderRadius: '50%',
+                        borderRadius: '110%',
                         objectFit: 'cover',
                     }}
                 />

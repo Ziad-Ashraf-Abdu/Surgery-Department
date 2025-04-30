@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import ProfileCompletionIndicator from './gen/ProfileCompletionIndicator';
-import {getTabIcon, calculateAge, calculateCompletion} from './gen/helperFunctions';
+import { getTabIcon, calculateAge, calculateCompletion } from './gen/helperFunctions';
 import './gen/doctorHP.css';
 
 // Vite env vars for Cloudinary
@@ -12,6 +12,8 @@ const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
 // configure your API base URL
 axios.defaults.baseURL = `${import.meta.env.VITE_API_URL}/api`;
 
+// Default fallback image for profiles
+const DEFAULT_PROFILE_IMAGE = '/static/images/default_profile.png';
 
 export default function ProfileHeader({
                                         user,
@@ -26,33 +28,34 @@ export default function ProfileHeader({
   // Normalize incoming user props
   const normalized = useMemo(() => {
     if (!user) return {};
+    const photoUrl = user.photo_url || DEFAULT_PROFILE_IMAGE;
     if (role === 'patient') {
       return {
         id: user.id,
-        name: user.name,
-        photo: user.photo_url,
-        gender: user.gender,
-        dob: user.dob,
+        name: user.name || '',
+        photo: photoUrl,
+        gender: user.gender || '',
+        dob: user.dob || '',
         age: calculateAge(user.dob),
-        bloodGroup: user.blood_type,
+        bloodGroup: user.blood_type || '',
         referredBy: user.referred_by_name || '',
         contact: {
-          primaryMobile: user.primary_mobile_no,
-          secondaryMobile: user.secondry_mobile_no,
-          email: user.email,
-          address: user.address
+          primaryMobile: user.primary_mobile_no || '',
+          secondaryMobile: user.secondry_mobile_no || '',
+          email: user.email || '',
+          address: user.address || ''
         }
       };
     } else {
       return {
         id: user.id,
-        name: user.name,
-        photo: user.photo_url,
+        name: user.name || '',
+        photo: photoUrl,
         specialization: user.specialization || '',
         department: user.department || '',
         contact: {
-          email: user.email,
-          phone: user.primary_mobile_no,
+          email: user.email || '',
+          phone: user.primary_mobile_no || '',
           office: user.office || ''
         },
         yearsExperience: user.years_experience || '',
@@ -92,9 +95,15 @@ export default function ProfileHeader({
     const file = e.target.files[0];
     if (!file) return;
 
+    // Local preview
     const reader = new FileReader();
     reader.onload = () => setPhoto(reader.result);
     reader.readAsDataURL(file);
+
+    if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) {
+      alert('Cloudinary configuration is missing.');
+      return;
+    }
 
     setUploading(true);
     const formData = new FormData();
@@ -165,6 +174,9 @@ export default function ProfileHeader({
 
   if (!user) return null;
 
+  // Determine which URL to show (fallback if needed)
+  const effectivePhoto = photo || photoUrl || DEFAULT_PROFILE_IMAGE;
+
   return (
       <header className="doctor-header-container">
         {/* Floating Reminder */}
@@ -178,23 +190,21 @@ export default function ProfileHeader({
               </button>
             </div>
         )}
+
         {/* Row 1: Profile picture & name */}
-        <div className="flex items-center cursor-pointer mb-4" onClick={toggleModal}>
+        <div
+            className="flex items-center cursor-pointer mb-4"
+            onClick={toggleModal}
+        >
           <ProfileCompletionIndicator
               percentage={completionPercentage}
-              photoUrl={photo || photoUrl}
+              photoUrl={effectivePhoto}
           />
           <div className="ml-4 profile-details">
             <h2 className="profile-name">
-              {role === 'doctor' ? `Dr. ${edited.name}` : edited.name}
+              {role === 'doctor' ? `Dr. ${edited.name ?? ''}` : edited.name ?? ''}
             </h2>
-            <p className="profile-info">
-              {"    "} ID: {normalized.id}
-            </p>
-            {/*<div className="status-badges">*/}
-            {/*  <span className="badge online-status">Online</span>*/}
-            {/*  <span className="badge appointment-count">3 Appts Today</span>*/}
-            {/*</div>*/}
+            <p className="profile-info">ID: {normalized.id}</p>
           </div>
         </div>
 
@@ -213,7 +223,7 @@ export default function ProfileHeader({
             </div>
         )}
 
-        {/* Enhanced Navigation Tabs */}
+        {/* Navigation Tabs */}
         {tabs.length > 0 && (
             <nav className="navigation-tabs">
               <ul className="tab-list">
@@ -239,7 +249,11 @@ export default function ProfileHeader({
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-4">
                     <div className="relative">
-                      <img src={photo || photoUrl} alt="Profile" className="profile-img" />
+                      <img
+                          src={effectivePhoto}
+                          alt="Profile"
+                          className="profile-img"
+                      />
 
                       {isEditing && (
                           <label className="absolute bottom-0 right-0 bg-green-600 text-white rounded-full p-2 cursor-pointer">
@@ -263,13 +277,15 @@ export default function ProfileHeader({
                       {isEditing ? (
                           <input
                               type="text"
-                              value={edited.name}
+                              value={edited.name ?? ''}
                               onChange={e => handleFieldChange('name', e.target.value)}
                               className="border-b border-gray-400 focus:outline-none text-xl font-semibold"
                           />
                       ) : (
                           <h3 className="text-xl font-semibold">
-                            {role === 'doctor' ? `Dr. ${edited.name}` : edited.name}
+                            {role === 'doctor'
+                                ? `Dr. ${edited.name ?? ''}`
+                                : edited.name ?? ''}
                           </h3>
                       )}
                     </div>
@@ -307,21 +323,27 @@ export default function ProfileHeader({
                     <>
                       <h4 className="font-semibold mt-2">Personal Info</h4>
                       <div className="space-y-2">
-                        {['age', 'gender', 'dob', 'bloodGroup', 'referredBy'].map(field => (
-                            <div key={field}>
-                              <strong>{field.charAt(0).toUpperCase() + field.slice(1)}:</strong>{' '}
-                              {isEditing ? (
-                                  <input
-                                      type="text"
-                                      value={edited[field]}
-                                      onChange={e => handleFieldChange(field, e.target.value)}
-                                      className="border-b border-gray-400 focus:outline-none"
-                                  />
-                              ) : (
-                                  normalized[field]
-                              )}
-                            </div>
-                        ))}
+                        {['age', 'gender', 'dob', 'bloodGroup', 'referredBy'].map(
+                            field => (
+                                <div key={field}>
+                                  <strong>
+                                    {field.charAt(0).toUpperCase() + field.slice(1)}:
+                                  </strong>{' '}
+                                  {isEditing ? (
+                                      <input
+                                          type="text"
+                                          value={edited[field] ?? ''}
+                                          onChange={e =>
+                                              handleFieldChange(field, e.target.value)
+                                          }
+                                          className="border-b border-gray-400 focus:outline-none"
+                                      />
+                                  ) : (
+                                      normalized[field]
+                                  )}
+                                </div>
+                            )
+                        )}
                       </div>
 
                       <h4 className="font-semibold mt-4">Contact Info</h4>
@@ -332,8 +354,10 @@ export default function ProfileHeader({
                               {isEditing ? (
                                   <input
                                       type="text"
-                                      value={edited.contact[k]}
-                                      onChange={e => handleFieldChange(`contact.${k}`, e.target.value)}
+                                      value={edited.contact[k] ?? ''}
+                                      onChange={e =>
+                                          handleFieldChange(`contact.${k}`, e.target.value)
+                                      }
                                       className="border-b border-gray-400 focus:outline-none"
                                   />
                               ) : (
@@ -353,8 +377,10 @@ export default function ProfileHeader({
                               {isEditing ? (
                                   <input
                                       type="text"
-                                      value={edited.contact[k]}
-                                      onChange={e => handleFieldChange(`contact.${k}`, e.target.value)}
+                                      value={edited.contact[k] ?? ''}
+                                      onChange={e =>
+                                          handleFieldChange(`contact.${k}`, e.target.value)
+                                      }
                                       className="border-b border-gray-400 focus:outline-none"
                                   />
                               ) : (
@@ -367,14 +393,14 @@ export default function ProfileHeader({
                           {isEditing ? (
                               <input
                                   type="number"
-                                  value={edited.yearsExperience}
+                                  value={edited.yearsExperience ?? ''}
                                   onChange={e =>
                                       handleFieldChange('yearsExperience', e.target.value)
                                   }
                                   className="border-b border-gray-400 focus:outline-none"
                               />
                           ) : (
-                              `${normalized.years_experience} years`
+                              `${normalized.yearsExperience} years`
                           )}
                         </div>
                         <div>
