@@ -169,67 +169,56 @@ export default function SignUp(props) {
         event.preventDefault();
         if (!validateInputs()) return;
 
+        // 🔍 DEBUG: ensure your env var is loaded
+        console.log('🚀 VITE_API_URL =', import.meta.env.VITE_API_URL);
+
+        const API_URL = import.meta.env.VITE_API_URL;
+        if (!API_URL) {
+            console.error('VITE_API_URL is undefined—check .env.local and restart the dev server');
+            return;
+        }
+
         const formData = new FormData(event.target);
         const buttonClicked = event.nativeEvent.submitter.value;
 
         const payload = {
-            name: formData.get('name'),
-            email: formData.get('email'),
-            password: formData.get('password'),
-            primaryMobileNo: formData.get('primaryMobileNo'),
+            name:             formData.get('name'),
+            email:            formData.get('email'),
+            password:         formData.get('password'),
+            primaryMobileNo:  formData.get('primaryMobileNo'),
             secondryMobileNo: formData.get('secondryMobileNo'),
-            address: formData.get('address'),
-            gender: formData.get('gender'),
+            address:          formData.get('address'),
+            gender:           formData.get('gender'),
         };
 
-        // Define proper URLs
-        const doctorUrl = 'http://127.0.0.1:8000/api/doctors/';
-        const patientUrl = 'http://127.0.0.1:8000/api/patients/';
+        // build the correct endpoint based on button
+        const endpoint =
+            buttonClicked === 'doctor'
+                ? `${API_URL}/api/doctors/`
+                : `${API_URL}/api/patients/`;
 
-        if (buttonClicked === "doctor") {
-            try {
-                const response = await fetch(doctorUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(payload),
-                });
+        try {
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
 
-                if (response.ok) {
-                    const result = await response.json();
-                    navigate("/doctor-home-page", { state: { doctorUser: result } });
+            if (response.ok) {
+                const result = await response.json();
+                if (buttonClicked === 'doctor') {
+                    navigate('/doctor-home-page', { state: { doctorUser: result } });
                 } else {
-                    const errorData = await response.json();
-                    setNameErrorMessage(errorData);
-                    console.error('Error:', errorData);
+                    navigate('/patient-home-page', { state: { patientUser: result } });
                 }
-            } catch (error) {
-                console.error('Error:', error);
-                setNameErrorMessage('Network error, please try again');
+            } else {
+                const errorData = await response.json();
+                console.error('Error:', errorData);
+                setNameErrorMessage(errorData.detail || 'Signup failed');
             }
-        } else if (buttonClicked === "patient") {
-            try {
-                const response = await fetch(patientUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(payload),
-                });
-
-                if (response.ok) {
-                    const result = await response.json();
-                    navigate("/patient-home-page", { state: { patientUser: result } });
-                } else {
-                    const errorData = await response.json();
-                    setNameErrorMessage(errorData);
-                    console.error('Error:', errorData);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                setNameErrorMessage('Network error, please try again');
-            }
+        } catch (error) {
+            console.error('Network error:', error);
+            setNameErrorMessage('Network error, please try again');
         }
     };
 

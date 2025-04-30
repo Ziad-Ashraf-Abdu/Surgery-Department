@@ -10,7 +10,7 @@ const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
 const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
 
 // configure your API base URL
-axios.defaults.baseURL = 'http://127.0.0.1:8000/api';
+axios.defaults.baseURL = `${import.meta.env.VITE_API_URL}/api`;
 
 
 export default function ProfileHeader({

@@ -85,47 +85,55 @@ export default function SignIn(props) {
     };
 
     const handleSubmit = async (event) => {
-      event.preventDefault();
-      if (!validateInputs()) return;
+        event.preventDefault();
+        if (!validateInputs()) return;
 
-      const form = new FormData(event.currentTarget);
-      const payload = {
-        email:    form.get('id'),
-        password: form.get('password'),
-      };
+        // 🔍 DEBUG: check that VITE_API_URL is loaded
+        console.log('🚀 VITE_API_URL =', import.meta.env.VITE_API_URL);
 
-      try {
-        const res = await fetch("http://127.0.0.1:8000/api/login/", {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
-        const json = await res.json();
-
-        if (res.ok) {
-          // json = { role: "patient"|"doctor", user: { ...fields... } }
-          if (json.role === 'patient') {
-            navigate('/patient-home-page', { state: { patientUser: json.user } });
-          } else {
-            navigate('/doctor-home-page', { state: { doctorUser: json.user } });
-          }
-        } else {
-          // 400 or 401
-          const msg = json.detail || 'Wrong email or password';
-          setIdErrorMessage(msg);
-          setPasswordErrorMessage(msg);
-          setIdError(true);
-          setPasswordError(true);
+        const API_URL = import.meta.env.VITE_API_URL;
+        if (!API_URL) {
+            console.error('VITE_API_URL is undefined – did you create .env.local and restart the dev server?');
+            return;
         }
-      } catch (err) {
-        console.error(err);
-        const msg = 'Network error, please try again';
-        setIdErrorMessage(msg);
-        setPasswordErrorMessage(msg);
-        setIdError(true);
-        setPasswordError(true);
-      }
+
+        const form = new FormData(event.currentTarget);
+        const payload = {
+            email:    form.get('id'),
+            password: form.get('password'),
+        };
+
+        try {
+            const res = await fetch(`${API_URL}/api/login/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+            const json = await res.json();
+
+            if (res.ok) {
+                if (json.role === 'patient') {
+                    navigate('/patient-home-page', { state: { patientUser: json.user } });
+                } else {
+                    navigate('/doctor-home-page', { state: { doctorUser: json.user } });
+                }
+            } else {
+                const msg = json.detail || 'Wrong email or password';
+                setIdErrorMessage(msg);
+                setPasswordErrorMessage(msg);
+                setIdError(true);
+                setPasswordError(true);
+            }
+        } catch (err) {
+            console.error('Fetch error:', err);
+            const msg = 'Network error, please try again';
+            setIdErrorMessage(msg);
+            setPasswordErrorMessage(msg);
+            setIdError(true);
+            setPasswordError(true);
+        }
     };
+
 
 
     const validateInputs = () => {
