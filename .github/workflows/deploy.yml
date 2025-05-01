@@ -9,26 +9,33 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Set up Defang CLI
+      - name: Install Defang CLI
         run: |
           curl -fsSL https://s.defang.io/install | bash
           echo "$HOME/.defang/bin" >> $GITHUB_PATH
 
-      - name: Check that DEFANG_TOKEN is set
+      - name: Add Defang to PATH
+        run: echo "$HOME/.defang/bin" >> $GITHUB_PATH
+
+      - name: Check Defang CLI and Token
         env:
           DEFANG_TOKEN: ${{ secrets.DEFANG_TOKEN }}
         run: |
+          defang --version || echo "❌ Defang not found"
           if [ -z "$DEFANG_TOKEN" ]; then
-            echo "DEFANG_TOKEN is missing!"
+            echo "❌ DEFANG_TOKEN is missing"
             exit 1
           else
-            echo "DEFANG_TOKEN is set (hidden for security)."
+            echo "✅ DEFANG_TOKEN is set"
           fi
 
       - name: Deploy to Defang
         env:
           DEFANG_TOKEN: ${{ secrets.DEFANG_TOKEN }}
+        working-directory: ./Backend/backend
         run: |
+          echo "🚀 Deploying from $(pwd)"
           defang compose up
