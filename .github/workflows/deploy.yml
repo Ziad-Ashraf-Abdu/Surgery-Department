@@ -22,7 +22,7 @@ jobs:
 
       - name: Check Defang CLI and Token
         env:
-          DEFANG_TOKEN: ${{ secrets.DEFANG_TOKEN }}
+          DEFANG_TOKEN: ${{secrets.DEFANG_TOKEN}}
         run: |
           defang --version || echo "❌ Defang not found"
           if [ -z "$DEFANG_TOKEN" ]; then
@@ -34,8 +34,9 @@ jobs:
 
       - name: Deploy to Defang
         env:
-          DEFANG_TOKEN: ${{ secrets.DEFANG_TOKEN }}
+          DEFANG_TOKEN: ${{secrets.DEFANG_TOKEN}}
         working-directory: ./Backend/backend
         run: |
           echo "🚀 Deploying from $(pwd)"
+          echo "$DEFANG_TOKEN" | defang login --token # this ensures the token is passed correctly
           defang compose up
