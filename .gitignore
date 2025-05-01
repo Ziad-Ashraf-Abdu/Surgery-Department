@@ -313,6 +313,7 @@ cython_debug/
 .history
 .ionide
 
+.idea/
 .github/
 
 # Support for Project snippet scope
