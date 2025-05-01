@@ -172,6 +172,7 @@ export default function SignUp(props) {
         // 🔍 DEBUG: ensure your env var is loaded
         console.log('🚀 VITE_API_URL =', import.meta.env.VITE_API_URL);
 
+        // Replace this with your localhost
         const API_URL = import.meta.env.VITE_API_URL;
         if (!API_URL) {
             console.error('VITE_API_URL is undefined—check .env.local and restart the dev server');

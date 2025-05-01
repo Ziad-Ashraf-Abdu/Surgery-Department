@@ -88,7 +88,7 @@ export default function SignIn(props) {
         event.preventDefault();
         if (!validateInputs()) return;
 
-        // 🔍 DEBUG: check that VITE_API_URL is loaded
+        // 🔍 DEBUG: check that VITE_API_URL is loaded Replace all of this with your localhost
         console.log('🚀 VITE_API_URL =', import.meta.env.VITE_API_URL);
 
         const API_URL = import.meta.env.VITE_API_URL;
@@ -96,6 +96,7 @@ export default function SignIn(props) {
             console.error('VITE_API_URL is undefined – did you create .env.local and restart the dev server?');
             return;
         }
+
 
         const form = new FormData(event.currentTarget);
         const payload = {

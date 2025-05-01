@@ -9,7 +9,7 @@ import './gen/doctorHP.css';
 const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
 const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
 
-// configure your API base URL
+// configure your API base URL use your localhost
 axios.defaults.baseURL = `${import.meta.env.VITE_API_URL}/api`;
 
 // Default fallback image for profiles
