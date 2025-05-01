@@ -19,6 +19,4 @@ jobs:
       - name: Deploy to Defang
         env:
           DEFANG_TOKEN: ${{ secrets.DEFANG_TOKEN }}
-        run: |
-          defang login --token "$DEFANG_TOKEN"
-          defang compose up
+        run: defang compose up
