@@ -2,7 +2,7 @@ name: Deploy to Defang Playground
 
 on:
   push:
-    branches: [main] 
+    branches: [main]
 
 jobs:
   deploy:
@@ -19,4 +19,6 @@ jobs:
       - name: Deploy to Defang
         env:
           DEFANG_TOKEN: ${{ secrets.DEFANG_TOKEN }}
-        run: defang compose up
+        run: |
+          export DEFANG_TOKEN="$DEFANG_TOKEN"
+          defang compose up
