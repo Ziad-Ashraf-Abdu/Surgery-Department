@@ -34,7 +34,7 @@ jobs:
 
       - name: Deploy to Defang
         env:
-          DEFANG_TOKEN: ${{secrets.DEFANG_TOKEN}}
+          DEFANG_TOKEN: 'eyJhbGciOiJFZERTQSIsImtpZCI6Iml3dXNkanNiaW04NCIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2ZhYnJpYy1wcm9kMS5kZWZhbmcuZGV2Iiwic3ViIjoiWmlhZC1Bc2hyYWYtQWJkdSIsImF1ZCI6WyIuIl0sImV4cCI6MTc0NjE4NDMzMn0.c4GnKIJ_UNxMdyTELf6bByz1E6ZlIz6Aqkv1RLCQfw4kd7AQ8-T1aTjbamkoYponBBBVa6k7nVgJvmkFX86nDQ'
         working-directory: ./Backend/backend
         run: |
           echo "🚀 Deploying from $(pwd)"
