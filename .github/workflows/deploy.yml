@@ -2,41 +2,24 @@ name: Deploy to Defang Playground
 
 on:
   push:
-    branches: [main]
+    branches: [main] 
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Install Defang CLI
+      - name: Set up Defang CLI
         run: |
           curl -fsSL https://s.defang.io/install | bash
           echo "$HOME/.defang/bin" >> $GITHUB_PATH
 
-      - name: Add Defang to PATH
-        run: echo "$HOME/.defang/bin" >> $GITHUB_PATH
-
-      - name: Check Defang CLI and Token
-        env:
-          DEFANG_TOKEN: ${{secrets.DEFANG_TOKEN}}
-        run: |
-          defang --version || echo "❌ Defang not found"
-          if [ -z "$DEFANG_TOKEN" ]; then
-            echo "❌ DEFANG_TOKEN is missing"
-            exit 1
-          else
-            echo "✅ DEFANG_TOKEN is set"
-          fi
-
       - name: Deploy to Defang
         env:
           DEFANG_TOKEN: 'eyJhbGciOiJFZERTQSIsImtpZCI6Iml3dXNkanNiaW04NCIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2ZhYnJpYy1wcm9kMS5kZWZhbmcuZGV2Iiwic3ViIjoiWmlhZC1Bc2hyYWYtQWJkdSIsImF1ZCI6WyIuIl0sImV4cCI6MTc0NjE4NDMzMn0.c4GnKIJ_UNxMdyTELf6bByz1E6ZlIz6Aqkv1RLCQfw4kd7AQ8-T1aTjbamkoYponBBBVa6k7nVgJvmkFX86nDQ'
-        working-directory: ./Backend/backend
+        working-directory: ./Backend/backend  
         run: |
-          echo "🚀 Deploying from $(pwd)"
-          echo "$DEFANG_TOKEN" | defang login --token # this ensures the token is passed correctly
+          defang login --token "$DEFANG_TOKEN"
           defang compose up
