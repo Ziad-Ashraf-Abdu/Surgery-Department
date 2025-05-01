@@ -2,24 +2,27 @@ name: Deploy to Defang Playground
 
 on:
   push:
-    branches: [main] 
+    branches: [main]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v3
+    # Expose the secret at the job level, so all steps inherit it
+    env:
+      DEFANG_ACCESS_TOKEN: ${{ secrets.DEFANG_TOKEN }}
 
-      - name: Set up Defang CLI
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Defang CLI
         run: |
           curl -fsSL https://s.defang.io/install | bash
           echo "$HOME/.defang/bin" >> $GITHUB_PATH
 
       - name: Deploy to Defang
-        env:
-          DEFANG_TOKEN: 'eyJhbGciOiJFZERTQSIsImtpZCI6Iml3dXNkanNiaW04NCIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2ZhYnJpYy1wcm9kMS5kZWZhbmcuZGV2Iiwic3ViIjoiWmlhZC1Bc2hyYWYtQWJkdSIsImF1ZCI6WyIuIl0sImV4cCI6MTc0NjE4NDMzMn0.c4GnKIJ_UNxMdyTELf6bByz1E6ZlIz6Aqkv1RLCQfw4kd7AQ8-T1aTjbamkoYponBBBVa6k7nVgJvmkFX86nDQ'
-        working-directory: ./Backend/backend  
+        working-directory: ./Backend/backend
         run: |
-          defang login --token "$DEFANG_TOKEN"
+          echo "🚀 Deploying from $(pwd)"
           defang compose up
