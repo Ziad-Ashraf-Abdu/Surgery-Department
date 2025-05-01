@@ -1,5 +1,6 @@
 from django.contrib.auth.hashers import check_password
 from rest_framework import status
+from django.db import connection
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import (
@@ -84,19 +85,52 @@ def login(request):
 @api_view(['GET', 'POST'])
 def patients_list_create(request):
     """
-    Handles retrieving the list of patients or creating a new patient.
+    Handles retrieving the list of patients or creating a new patient using raw SQL.
     """
     if request.method == 'GET':
-        patients = Patient.objects.all()
-        serializer = PatientSerializer(patients, many=True)
-        return Response(serializer.data)
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT * FROM patient")
+            columns = [col[0] for col in cursor.description]
+            patients = [dict(zip(columns, row)) for row in cursor.fetchall()]
+        return Response(patients)
 
     elif request.method == 'POST':
-        serializer = PatientSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        data = request.data
+
+        required_fields = ['name', 'gender', 'dob', 'primary_mobile_no', 'password']
+        for field in required_fields:
+            if not data.get(field):
+                return Response({"error": f"'{field}' is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    INSERT INTO patient (
+                        name, photo_url, gender, dob, primary_mobile_no,
+                        secondry_mobile_no, email, address, referred_by,
+                        blood_type, password
+                    )
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    RETURNING id
+                """, [
+                    data.get('name'),
+                    data.get('photo_url'),
+                    data.get('gender'),
+                    data.get('dob'),
+                    data.get('primary_mobile_no'),
+                    data.get('secondry_mobile_no'),
+                    data.get('email'),
+                    data.get('address'),
+                    data.get('referred_by'),
+                    data.get('blood_type'),
+                    data.get('password'),
+                ])
+                new_id = cursor.fetchone()[0]
+            return Response({"message": "Patient created", "id": new_id}, status=status.HTTP_201_CREATED)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 @api_view(['GET', 'PUT', 'PATCH', 'DELETE'])
