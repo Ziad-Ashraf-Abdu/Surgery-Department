@@ -9,7 +9,7 @@ import './gen/doctorHP.css';
 const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
 const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
 
-// configure your API base URL use your localhost
+// configure your API base URL
 axios.defaults.baseURL = `${import.meta.env.VITE_API_URL}/api`;
 
 // Default fallback image for profiles
@@ -154,21 +154,89 @@ export default function ProfileHeader({
             ? `/doctors/${normalized.id}/`
             : `/patients/${normalized.id}/`;
 
-    const payload = { ...edited };
-    if (payload.photo) {
-      payload.photo_url = payload.photo;
-      delete payload.photo;
+    // Build the raw, snake_case payload
+    let raw;
+    if (role === 'patient') {
+      const {
+        name,
+        gender,
+        dob,
+        bloodGroup,
+        referredBy,
+        photo: editedPhoto
+      } = edited;
+      const {
+        primaryMobile,
+        secondaryMobile,
+        email,
+        address
+      } = edited.contact;
+
+      raw = {
+        name,
+        photo_url: editedPhoto ?? normalized.photo,
+        gender,
+        dob,
+        primary_mobile_no: primaryMobile,
+        secondry_mobile_no: secondaryMobile,
+        email,
+        address,
+        blood_type: bloodGroup,
+        referred_by: referredBy
+      };
+    } else {
+      const {
+        name,
+        specialization,
+        department,
+        yearsExperience,
+        photo: editedPhoto
+      } = edited;
+      const {
+        email,
+        phone,
+        office
+      } = edited.contact;
+
+      raw = {
+        name,
+        photo_url: editedPhoto ?? normalized.photo,
+        specialization,
+        department,
+        primary_mobile_no: phone,
+        email,
+        office,
+        years_experience: yearsExperience,
+        credentials: edited.credentials,
+        certifications: edited.certifications,
+        affiliations: edited.affiliations
+      };
     }
 
+    // Strip out undefined or empty-string fields
+    const payload = {};
+    Object.entries(raw).forEach(([key, val]) => {
+      if (val !== undefined && val !== '') {
+        payload[key] = val;
+      }
+    });
+
     try {
-      const response = await axios.patch(endpoint, payload);
+      const response = await axios.patch(endpoint, payload, {
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }
+      });
       onUserUpdate(response.data);
       setIsEditing(false);
       setShowModal(false);
       alert('Profile updated successfully!');
     } catch (error) {
-      console.error('Error updating profile:', error);
-      alert('Failed to update profile. Please try again.');
+      if (error.response) {
+        console.error(`API ${error.response.status} —`, error.response.data);
+        alert('Update failed: ' + JSON.stringify(error.response.data, null, 2));
+      } else {
+        console.error('Network or unexpected error:', error);
+        alert('Failed to update profile. Please try again.');
+      }
     }
   };
 
