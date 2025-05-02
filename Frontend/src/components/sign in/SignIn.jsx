@@ -188,13 +188,13 @@ export default function SignIn(props) {
                         sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
                     >
                         <FormControl>
-                            <FormLabel htmlFor="id">ID</FormLabel>
+                            <FormLabel htmlFor="id">Email</FormLabel>
                             <TextField
                                 error={idError}
                                 helperText={idErrorMessage}
                                 id="id"
                                 name="id"
-                                placeholder="your ID"
+                                placeholder="your Email"
                                 autoComplete="off"
                                 autoFocus
                                 required
