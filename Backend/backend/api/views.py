@@ -1,8 +1,11 @@
-from django.contrib.auth.hashers import check_password
-from rest_framework import status
+from django.views.decorators.csrf import csrf_exempt
 from django.db import connection
-from rest_framework.decorators import api_view
+from django.contrib.auth.hashers import check_password, make_password
+from rest_framework import status
+from rest_framework.decorators import api_view, renderer_classes
+from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
+
 from .models import (
     Patient, Doctors, Scan, Appointment, FamilyRelatives,
     Grouptable, MedicalHistory
@@ -13,146 +16,137 @@ from .serializers import (
     GrouptableSerializer, MedicalHistorySerializer
 )
 
-
+# -----------------------------------------------------------------------------
 # Login API
+# -----------------------------------------------------------------------------
+@csrf_exempt
 @api_view(['POST'])
+@renderer_classes([JSONRenderer])
 def login(request):
     """
-    Handles user authentication for both patients and doctors.
-
-    POST Request Body:
-        {
-            "email": "user@example.com",
-            "password": "user_password"
-        }
-
-    Response:
-        - On Success (HTTP 200):
-            {
-                "role": "patient" or "doctor",
-                "user": {...}  # User details serialized
-            }
-        - On Error (HTTP 400 or 401):
-            {
-                "detail": "Error message"
-            }
+    POST /api/login/
+      { "email": "...", "password": "..." }
+    Always returns JSON.
     """
-    email = request.data.get('email')
-    password = request.data.get('password')
-
-    # Validate that email and password are provided
-    if not email or not password:
-        return Response(
-            {"detail": "Email and password are required."},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-
     try:
-        # Try finding the user as a patient
-        user = Patient.objects.get(email=email)
-        role = 'patient'
-    except Patient.DoesNotExist:
-        try:
-            # Try finding the user as a doctor
-            user = Doctors.objects.get(email=email)
+        email = request.data.get('email')
+        password = request.data.get('password')
+        if not email or not password:
+            return Response(
+                {"detail": "Email and password are required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Attempt to find exactly one patient with this email
+        patients = Patient.objects.filter(email=email)
+        if patients.count() > 1:
+            return Response(
+                {"detail": "Multiple patient accounts found with this email."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        if patients.exists():
+            user = patients.first()
+            role = 'patient'
+        else:
+            # Then attempt doctors
+            doctors = Doctors.objects.filter(email=email)
+            if doctors.count() > 1:
+                return Response(
+                    {"detail": "Multiple doctor accounts found with this email."},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+            if not doctors.exists():
+                return Response(
+                    {"detail": "Invalid credentials."},
+                    status=status.HTTP_401_UNAUTHORIZED
+                )
+            user = doctors.first()
             role = 'doctor'
-        except Doctors.DoesNotExist:
+
+        # Validate the password
+        if not check_password(password, user.password):
             return Response(
                 {"detail": "Invalid credentials."},
                 status=status.HTTP_401_UNAUTHORIZED
             )
 
-    # Validate the password
-    if not check_password(password, user.password):
+        # Serialize and return
+        serializer = PatientSerializer(user) if role == 'patient' else DoctorSerializer(user)
         return Response(
-            {"detail": "Invalid credentials."},
-            status=status.HTTP_401_UNAUTHORIZED
+            {"role": role, "user": serializer.data},
+            status=status.HTTP_200_OK
         )
 
-    # Serialize the user based on their role
-    serializer = PatientSerializer(user) if role == 'patient' else DoctorSerializer(user)
+    except Exception as exc:
+        return Response(
+            {"detail": f"Server error: {str(exc)}"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
 
-    return Response(
-        {
-            "role": role,
-            "user": serializer.data
-        },
-        status=status.HTTP_200_OK
-    )
-
-
-# Patient APIs
+# -----------------------------------------------------------------------------
+# Patient List/Create (raw SQL) — unchanged except password hashing
+# -----------------------------------------------------------------------------
 @api_view(['GET', 'POST'])
+@renderer_classes([JSONRenderer])
 def patients_list_create(request):
-    """
-    Handles retrieving the list of patients or creating a new patient using raw SQL.
-    """
     if request.method == 'GET':
         with connection.cursor() as cursor:
-            cursor.execute("SELECT * FROM patient")
-            columns = [col[0] for col in cursor.description]
-            patients = [dict(zip(columns, row)) for row in cursor.fetchall()]
+            cursor.execute(
+                "SELECT id,name,photo_url,gender,dob,primary_mobile_no,"
+                "secondry_mobile_no,email,address,referred_by,blood_type "
+                "FROM patient"
+            )
+            cols = [c[0] for c in cursor.description]
+            patients = [dict(zip(cols, row)) for row in cursor.fetchall()]
         return Response(patients)
 
-    elif request.method == 'POST':
-        data = request.data
-
-        # Validate required fields
-        required_fields = ['name', 'gender', 'primary_mobile_no', 'password']
-        for field in required_fields:
-            if not data.get(field):
-                return Response(
-                    {"error": f"'{field}' is required."},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-
-        try:
-            with connection.cursor() as cursor:
-                # 1) Insert new patient, return the new id
-                cursor.execute("""
-                    INSERT INTO patient (
-                        name,
-                        photo_url,
-                        gender,
-                        dob,
-                        primary_mobile_no,
-                        secondry_mobile_no,
-                        email,
-                        address,
-                        referred_by,
-                        blood_type,
-                        password
-                    )
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                    RETURNING id
-                """, [
-                    data.get('name'),
-                    data.get('photo_url'),
-                    data.get('gender'),
-                    data.get('dob'),
-                    data.get('primary_mobile_no'),
-                    data.get('secondry_mobile_no'),
-                    data.get('email'),
-                    data.get('address'),
-                    data.get('referred_by'),
-                    data.get('blood_type'),
-                    data.get('password'),
-                ])
-                new_id = cursor.fetchone()[0]
-
-                # 2) Fetch the full row for the newly created patient
-                cursor.execute("SELECT * FROM patient WHERE id = %s", [new_id])
-                columns = [col[0] for col in cursor.description]
-                patient_data = dict(zip(columns, cursor.fetchone()))
-
-            # Return the full patient record
-            return Response(patient_data, status=status.HTTP_201_CREATED)
-
-        except Exception as e:
+    # POST → hash password before INSERT
+    data = request.data
+    for f in ['name','gender','primary_mobile_no','password']:
+        if not data.get(f):
             return Response(
-                {"error": str(e)},
+                {"error": f"'{f}' is required."},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+    hashed = make_password(data['password'])
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                INSERT INTO patient (
+                    name,photo_url,gender,dob,primary_mobile_no,
+                    secondry_mobile_no,email,address,referred_by,
+                    blood_type,password
+                ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                RETURNING id
+            """, [
+                data.get('name'),
+                data.get('photo_url'),
+                data.get('gender'),
+                data.get('dob'),
+                data.get('primary_mobile_no'),
+                data.get('secondry_mobile_no'),
+                data.get('email'),
+                data.get('address'),
+                data.get('referred_by'),
+                data.get('blood_type'),
+                hashed
+            ])
+            new_id = cursor.fetchone()[0]
+            cursor.execute("""
+                SELECT id,name,photo_url,gender,dob,primary_mobile_no,
+                       secondry_mobile_no,email,address,referred_by,blood_type
+                FROM patient WHERE id=%s
+            """, [new_id])
+            cols = [c[0] for c in cursor.description]
+            patient_data = dict(zip(cols, cursor.fetchone()))
+        return Response(patient_data, status=status.HTTP_201_CREATED)
+
+    except Exception as exc:
+        return Response(
+            {"error": str(exc)},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
 
 

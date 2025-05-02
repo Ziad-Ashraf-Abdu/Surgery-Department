@@ -84,54 +84,74 @@ export default function SignIn(props) {
         navigate('/sign-up');
     };
 
+// Full updated handleSubmit function in SignIn.jsx
+
     const handleSubmit = async (event) => {
         event.preventDefault();
         if (!validateInputs()) return;
 
-        // 🔍 DEBUG: check that VITE_API_URL is loaded Replace all of this with your localhost
-        console.log('🚀 VITE_API_URL =', import.meta.env.VITE_API_URL);
-
         const API_URL = import.meta.env.VITE_API_URL;
-        if (!API_URL) {
-            console.error('VITE_API_URL is undefined – did you create .env.local and restart the dev server?');
-            return;
-        }
-
+        console.log('🚀 VITE_API_URL =', API_URL);
 
         const form = new FormData(event.currentTarget);
         const payload = {
-            email:    form.get('id'),
+            email: form.get('id'),
             password: form.get('password'),
         };
 
         try {
             const res = await fetch(`${API_URL}/api/login/`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
                 body: JSON.stringify(payload),
             });
-            const json = await res.json();
 
-            if (res.ok) {
-                if (json.role === 'patient') {
-                    navigate('/patient-home-page', { state: { patientUser: json.user } });
-                } else {
-                    navigate('/doctor-home-page', { state: { doctorUser: json.user } });
-                }
+            // Log status for debugging
+            console.log('HTTP status:', res.status);
+
+            // Determine response type
+            const ct = res.headers.get('content-type') || '';
+            let data;
+            if (ct.includes('application/json')) {
+                data = await res.json();
             } else {
-                const msg = json.detail || 'Wrong email or password';
-                setIdErrorMessage(msg);
-                setPasswordErrorMessage(msg);
+                const text = await res.text();
+                console.error('👀 non-JSON response:', text);
+                throw new Error('Server returned non-JSON response');
+            }
+
+            // Log payload for debugging
+            console.log('Response payload:', data);
+
+            // Handle HTTP errors
+            if (!res.ok) {
+                const msg = data.detail || 'Wrong email or password';
                 setIdError(true);
                 setPasswordError(true);
+                setIdErrorMessage(msg);
+                setPasswordErrorMessage(msg);
+                return;
             }
+
+            // On success, redirect based on role
+            if (data.role === 'patient') {
+                navigate('/patient-home-page', { state: { patientUser: data.user } });
+            } else {
+                navigate('/doctor-home-page', { state: { doctorUser: data.user } });
+            }
+
         } catch (err) {
             console.error('Fetch error:', err);
-            const msg = 'Network error, please try again';
-            setIdErrorMessage(msg);
-            setPasswordErrorMessage(msg);
+            const msg = err.message.includes('non-JSON')
+                ? 'Server error, check console'
+                : 'Network error, please try again';
             setIdError(true);
             setPasswordError(true);
+            setIdErrorMessage(msg);
+            setPasswordErrorMessage(msg);
         }
     };
 

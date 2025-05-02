@@ -165,40 +165,56 @@ export default function SignUp(props) {
         return isValid;
     };
 
+// In SignUp.jsx, replace your existing handleSubmit with this:
+
     const handleSubmit = async (event) => {
         event.preventDefault();
         if (!validateInputs()) return;
 
-        // 🔍 DEBUG: ensure your env var is loaded
-        console.log('🚀 VITE_API_URL =', import.meta.env.VITE_API_URL);
-
-        // Replace this with your localhost
         const API_URL = import.meta.env.VITE_API_URL;
-        if (!API_URL) {
-            console.error('VITE_API_URL is undefined—check .env.local and restart the dev server');
-            return;
-        }
+        console.log('🚀 VITE_API_URL =', API_URL);
 
         const formData = new FormData(event.target);
-        const buttonClicked = event.nativeEvent.submitter.value;
-
+        const email = formData.get('email');
         const payload = {
-            name:             formData.get('name'),
-            email:            formData.get('email'),
-            password:         formData.get('password'),
-            primary_mobile_no:  formData.get('primaryMobileNo'),
+            name: formData.get('name'),
+            email,
+            password: formData.get('password'),
+            primary_mobile_no: formData.get('primaryMobileNo'),
             secondary_mobile_no: formData.get('secondaryMobileNo'),
-            address:          formData.get('address'),
-            gender:           formData.get('gender'),
+            address: formData.get('address'),
+            gender: formData.get('gender'),
         };
 
-        // build the correct endpoint based on button
-        const endpoint =
-            buttonClicked === 'doctor'
-                ? `${API_URL}/api/doctors/`
-                : `${API_URL}/api/patients/`;
-
         try {
+            // 1) Check whether email already exists among patients or doctors
+            const checkEndpoints = [
+                `${API_URL}/api/patients/?email=${encodeURIComponent(email)}`,
+                `${API_URL}/api/doctors/?email=${encodeURIComponent(email)}`,
+            ];
+            const [patientsRes, doctorsRes] = await Promise.all(
+                checkEndpoints.map((url) =>
+                    fetch(url, { headers: { 'Accept': 'application/json' } })
+                )
+            );
+            const [patients, doctors] = await Promise.all([
+                patientsRes.ok ? patientsRes.json() : [],
+                doctorsRes.ok ? doctorsRes.json() : [],
+            ]);
+            if (patients.length > 0 || doctors.length > 0) {
+                setEmailError(true);
+                setEmailErrorMessage('An account with this email already exists.');
+                return;
+            }
+
+            // 2) Build the correct endpoint based on which button was clicked
+            const buttonClicked = event.nativeEvent.submitter.value;
+            const endpoint =
+                buttonClicked === 'doctor'
+                    ? `${API_URL}/api/doctors/`
+                    : `${API_URL}/api/patients/`;
+
+            // 3) Submit the new account
             const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -214,14 +230,18 @@ export default function SignUp(props) {
                 }
             } else {
                 const errorData = await response.json();
-                console.error('Error:', errorData);
-                setNameErrorMessage(errorData.detail || 'Signup failed');
+                console.error('Signup error:', errorData);
+                setEmailError(true);
+                setEmailErrorMessage(errorData.detail || 'Signup failed');
             }
+
         } catch (error) {
             console.error('Network error:', error);
-            setNameErrorMessage('Network error, please try again');
+            setEmailError(true);
+            setEmailErrorMessage('Network error, please try again');
         }
     };
+
 
 
     return (
