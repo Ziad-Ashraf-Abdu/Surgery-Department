@@ -14,12 +14,11 @@ import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
 import ForgotPassword from './ForgotPassword';
+import Preload from '../preload';
 import AppTheme from './theme/AppTheme';
 import ColorModeSelect from './theme/ColorModeSelect';
 import { LogoIcon } from './CustomIcons';
 import { useNavigate } from 'react-router-dom';
-
-//import { patientUser, doctorUser } from "../../data/sampleData";
 
 const Card = styled(MuiCard)(({ theme }) => ({
     display: 'flex',
@@ -29,9 +28,7 @@ const Card = styled(MuiCard)(({ theme }) => ({
     padding: theme.spacing(4),
     gap: theme.spacing(2),
     margin: 'auto',
-    [theme.breakpoints.up('sm')]: {
-        maxWidth: '450px',
-    },
+    [theme.breakpoints.up('sm')]: { maxWidth: '450px' },
     boxShadow:
         'hsla(220, 30%, 5%, 0.05) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.05) 0px 15px 35px -5px',
     ...theme.applyStyles('dark', {
@@ -44,10 +41,8 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
     height: 'calc((1 - var(--template-frame-height, 0)) * 100dvh)',
     minHeight: '100%',
     padding: theme.spacing(2),
-    [theme.breakpoints.up('sm')]: {
-        padding: theme.spacing(4),
-    },
-    backgroundColor: "#B5FCCD",
+    [theme.breakpoints.up('sm')]: { padding: theme.spacing(4) },
+    backgroundColor: '#B5FCCD',
     '&::before': {
         content: '""',
         display: 'block',
@@ -70,97 +65,17 @@ export default function SignIn(props) {
     const [passwordError, setPasswordError] = React.useState(false);
     const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
     const [open, setOpen] = React.useState(false);
+    const [loading, setLoading] = React.useState(false);
+    const [showPassword, setShowPassword] = React.useState(false);
     const navigate = useNavigate();
 
-    const handleClickOpen = () => {
-        setOpen(true);
-    };
-
-    const handleClose = () => {
-        setOpen(false);
-    };
-
-    const handleClickSignUp = () => {
-        navigate('/sign-up');
-    };
-
-// Full updated handleSubmit function in SignIn.jsx
-
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-        if (!validateInputs()) return;
-
-        const API_URL = import.meta.env.VITE_API_URL;
-        console.log('🚀 VITE_API_URL =', API_URL);
-
-        const form = new FormData(event.currentTarget);
-        const payload = {
-            email: form.get('id'),
-            password: form.get('password'),
-        };
-
-        try {
-            const res = await fetch(`${API_URL}/api/login/`, {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload),
-            });
-
-            // Log status for debugging
-            console.log('HTTP status:', res.status);
-
-            // Determine response type
-            const ct = res.headers.get('content-type') || '';
-            let data;
-            if (ct.includes('application/json')) {
-                data = await res.json();
-            } else {
-                const text = await res.text();
-                console.error('👀 non-JSON response:', text);
-                throw new Error('Server returned non-JSON response');
-            }
-
-            // Log payload for debugging
-            console.log('Response payload:', data);
-
-            // Handle HTTP errors
-            if (!res.ok) {
-                const msg = data.detail || 'Wrong email or password';
-                setIdError(true);
-                setPasswordError(true);
-                setIdErrorMessage(msg);
-                setPasswordErrorMessage(msg);
-                return;
-            }
-
-            // On success, redirect based on role
-            if (data.role === 'patient') {
-                navigate('/patient-home-page', { state: { patientUser: data.user } });
-            } else {
-                navigate('/doctor-home-page', { state: { doctorUser: data.user } });
-            }
-
-        } catch (err) {
-            console.error('Fetch error:', err);
-            const msg = err.message.includes('non-JSON')
-                ? 'Server error, check console'
-                : 'Network error, please try again';
-            setIdError(true);
-            setPasswordError(true);
-            setIdErrorMessage(msg);
-            setPasswordErrorMessage(msg);
-        }
-    };
-
-
+    const handleClickOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
+    const handleClickSignUp = () => navigate('/sign-up');
 
     const validateInputs = () => {
         const id = document.getElementById('id');
         const password = document.getElementById('password');
-
         let isValid = true;
 
         if (!id.value) {
@@ -184,12 +99,79 @@ export default function SignIn(props) {
         return isValid;
     };
 
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        if (!validateInputs()) return;
+
+        setLoading(true);
+        const API_URL = import.meta.env.VITE_API_URL;
+        console.log('🚀 VITE_API_URL =', API_URL);
+
+        const form = new FormData(event.currentTarget);
+        const payload = {
+            email: form.get('id'),
+            password: form.get('password'),
+        };
+
+        try {
+            const res = await fetch(`${API_URL}/api/login/`, {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            });
+
+            console.log('HTTP status:', res.status);
+
+            const ct = res.headers.get('content-type') || '';
+            let data;
+            if (ct.includes('application/json')) {
+                data = await res.json();
+            } else {
+                const text = await res.text();
+                console.error('👀 non-JSON response:', text);
+                throw new Error('Server returned non-JSON response');
+            }
+
+            console.log('Response payload:', data);
+            setLoading(false);
+
+            if (!res.ok) {
+                const msg = data.detail || 'Wrong email or password';
+                setIdError(true);
+                setPasswordError(true);
+                setIdErrorMessage(msg);
+                setPasswordErrorMessage(msg);
+                return;
+            }
+
+            if (data.role === 'patient') {
+                navigate('/patient-home-page', { state: { patientUser: data.user } });
+            } else {
+                navigate('/doctor-home-page', { state: { doctorUser: data.user } });
+            }
+        } catch (err) {
+            console.error('Fetch error:', err);
+            setLoading(false);
+            const msg = err.message.includes('non-JSON')
+                ? 'Server error, check console'
+                : 'Network error, please try again';
+            setIdError(true);
+            setPasswordError(true);
+            setIdErrorMessage(msg);
+            setPasswordErrorMessage(msg);
+        }
+    };
+
     return (
         <AppTheme {...props}>
             <CssBaseline enableColorScheme />
             <SignInContainer direction="column" justifyContent="space-between">
                 <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
                 <Card variant="outlined">
+                    {loading && <Preload />}
                     <LogoIcon />
                     <Typography
                         component="h1"
@@ -203,12 +185,7 @@ export default function SignIn(props) {
                         component="form"
                         onSubmit={handleSubmit}
                         noValidate
-                        sx={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            width: '100%',
-                            gap: 2,
-                        }}
+                        sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
                     >
                         <FormControl>
                             <FormLabel htmlFor="id">ID</FormLabel>
@@ -216,7 +193,6 @@ export default function SignIn(props) {
                                 error={idError}
                                 helperText={idErrorMessage}
                                 id="id"
-                                type="text"
                                 name="id"
                                 placeholder="your ID"
                                 autoComplete="off"
@@ -232,12 +208,11 @@ export default function SignIn(props) {
                             <TextField
                                 error={passwordError}
                                 helperText={passwordErrorMessage}
-                                name="password"
-                                placeholder="••••••"
-                                type="password"
                                 id="password"
+                                name="password"
+                                type={showPassword ? 'text' : 'password'}
+                                placeholder="••••••"
                                 autoComplete="current-password"
-                                autoFocus
                                 required
                                 fullWidth
                                 variant="outlined"
@@ -245,26 +220,25 @@ export default function SignIn(props) {
                             />
                         </FormControl>
                         <FormControlLabel
+                            control={
+                                <Checkbox
+                                    checked={showPassword}
+                                    onChange={() => setShowPassword(!showPassword)}
+                                    color="primary"
+                                />
+                            }
+                            label="Show password"
+                        />
+                        <FormControlLabel
                             control={<Checkbox value="remember" color="primary" />}
                             label="Remember me"
                         />
                         <ForgotPassword open={open} handleClose={handleClose} />
-                        <Button
-                            type="submit"
-                            fullWidth
-                            variant="contained"
-                            onClick={validateInputs}
-                            sx={{
-                                '&:hover': {
-                                    backgroundColor: '#3D90D7',
-                                },
-                            }}
-                        >
+                        <Button type="submit" fullWidth variant="contained">
                             Sign in
                         </Button>
                         <Link
                             component="button"
-                            type="button"
                             onClick={handleClickOpen}
                             variant="body2"
                             sx={{ alignSelf: 'center' }}
@@ -276,13 +250,8 @@ export default function SignIn(props) {
                     <Divider>or</Divider>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                         <Typography sx={{ textAlign: 'center' }}>
-                            Don&apos;t have an account?{' '}
-                            <Link
-                                onClick={handleClickSignUp}
-                                variant="body2"
-                                sx={{ alignSelf: 'center' }}
-                                color={'#3D90D7'}
-                            >
+                            Don’t have an account?{' '}
+                            <Link onClick={handleClickSignUp} variant="body2" color={'#3D90D7'}>
                                 Sign up
                             </Link>
                         </Typography>

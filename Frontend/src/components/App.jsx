@@ -4,6 +4,7 @@ import DoctorHP from "./doctorHP";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import SignIn from "./sign in/SignIn";
 import SignUp from "./sign up/SignUp";
+import Preload from "./preload";
 
 export default function App() {
   return (

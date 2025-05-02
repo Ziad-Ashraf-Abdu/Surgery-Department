@@ -3,6 +3,7 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import Divider from '@mui/material/Divider';
+import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormLabel from '@mui/material/FormLabel';
 import FormControl from '@mui/material/FormControl';
@@ -13,6 +14,7 @@ import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
 import {FormHelperText, RadioGroup, Radio } from '@mui/material';
+import Preload from '../preload'
 import AppTheme from '../sign in/theme/AppTheme';
 import ColorModeSelect from '../sign in/theme/ColorModeSelect';
 import { LogoIcon } from '../sign in/CustomIcons';
@@ -84,6 +86,8 @@ export default function SignUp(props) {
     const [genderError, setGenderError] = useState(false);
     const [genderErrorMessage, setGenderErrorMessage] = useState('');
 
+    const [loading, setLoading] = React.useState(false);
+    const [showPassword, setShowPassword] = React.useState(false);
 
     const navigate = useNavigate();
 
@@ -166,11 +170,11 @@ export default function SignUp(props) {
     };
 
 // In SignUp.jsx, replace your existing handleSubmit with this:
-
     const handleSubmit = async (event) => {
         event.preventDefault();
         if (!validateInputs()) return;
 
+        setLoading(true);
         const API_URL = import.meta.env.VITE_API_URL;
         console.log('🚀 VITE_API_URL =', API_URL);
 
@@ -187,39 +191,20 @@ export default function SignUp(props) {
         };
 
         try {
-            // 1) Check whether email already exists among patients or doctors
-            const checkEndpoints = [
-                `${API_URL}/api/patients/?email=${encodeURIComponent(email)}`,
-                `${API_URL}/api/doctors/?email=${encodeURIComponent(email)}`,
-            ];
-            const [patientsRes, doctorsRes] = await Promise.all(
-                checkEndpoints.map((url) =>
-                    fetch(url, { headers: { 'Accept': 'application/json' } })
-                )
-            );
-            const [patients, doctors] = await Promise.all([
-                patientsRes.ok ? patientsRes.json() : [],
-                doctorsRes.ok ? doctorsRes.json() : [],
-            ]);
-            if (patients.length > 0 || doctors.length > 0) {
-                setEmailError(true);
-                setEmailErrorMessage('An account with this email already exists.');
-                return;
-            }
-
-            // 2) Build the correct endpoint based on which button was clicked
+            // Determine endpoint based on button clicked
             const buttonClicked = event.nativeEvent.submitter.value;
             const endpoint =
                 buttonClicked === 'doctor'
                     ? `${API_URL}/api/doctors/`
                     : `${API_URL}/api/patients/`;
 
-            // 3) Submit the new account
+            // Submit new account
             const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
             });
+            setLoading(false);
 
             if (response.ok) {
                 const result = await response.json();
@@ -239,6 +224,7 @@ export default function SignUp(props) {
             console.error('Network error:', error);
             setEmailError(true);
             setEmailErrorMessage('Network error, please try again');
+            setLoading(false);
         }
     };
 
@@ -250,7 +236,7 @@ export default function SignUp(props) {
             <SignUpContainer direction="column" justifyContent="space-between">
                 <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
                 <Card variant="outlined">
-
+                    {loading && <Preload />}
                     <Box
                         component="form"
                         onSubmit={handleSubmit}
@@ -301,7 +287,7 @@ export default function SignUp(props) {
                                 fullWidth
                                 name="password"
                                 placeholder="••••••"
-                                type="password"
+                                type={showPassword ? 'text' : 'password'}
                                 id="password"
                                 autoComplete="new-password"
                                 variant="outlined"
@@ -310,6 +296,16 @@ export default function SignUp(props) {
                                 color={passwordError ? 'error' : 'primary'}
                             />
                         </FormControl>
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    value="showPassword"
+                                    color="primary"
+                                    onChange={() => setShowPassword(!showPassword)}
+                                />
+                            }
+                            label="Show password"
+                        />
                         <FormControl>
                             <FormLabel htmlFor="primaryMobileNo">Primary mobile number</FormLabel>
                             <TextField

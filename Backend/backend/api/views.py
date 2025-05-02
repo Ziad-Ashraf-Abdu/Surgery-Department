@@ -41,7 +41,7 @@ def login(request):
         patients = Patient.objects.filter(email=email)
         if patients.count() > 1:
             return Response(
-                {"detail": "Multiple patient accounts found with this email."},
+                {"detail": "Multiple patient accounts found with this email, contact admin."},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         if patients.exists():
@@ -52,7 +52,7 @@ def login(request):
             doctors = Doctors.objects.filter(email=email)
             if doctors.count() > 1:
                 return Response(
-                    {"detail": "Multiple doctor accounts found with this email."},
+                    {"detail": "Multiple doctor accounts found with this email, contact admin."},
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
             if not doctors.exists():
