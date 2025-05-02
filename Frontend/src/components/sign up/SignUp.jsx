@@ -186,8 +186,8 @@ export default function SignUp(props) {
             name:             formData.get('name'),
             email:            formData.get('email'),
             password:         formData.get('password'),
-            primaryMobileNo:  formData.get('primaryMobileNo'),
-            secondryMobileNo: formData.get('secondryMobileNo'),
+            primary_mobile_no:  formData.get('primaryMobileNo'),
+            secondary_mobile_no: formData.get('secondaryMobileNo'),
             address:          formData.get('address'),
             gender:           formData.get('gender'),
         };

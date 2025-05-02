@@ -1,5 +1,6 @@
 from django.contrib.auth.hashers import check_password
 from rest_framework import status
+from django.db import connection
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import (
@@ -84,46 +85,140 @@ def login(request):
 @api_view(['GET', 'POST'])
 def patients_list_create(request):
     """
-    Handles retrieving the list of patients or creating a new patient.
+    Handles retrieving the list of patients or creating a new patient using raw SQL.
     """
     if request.method == 'GET':
-        patients = Patient.objects.all()
-        serializer = PatientSerializer(patients, many=True)
-        return Response(serializer.data)
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT * FROM patient")
+            columns = [col[0] for col in cursor.description]
+            patients = [dict(zip(columns, row)) for row in cursor.fetchall()]
+        return Response(patients)
 
     elif request.method == 'POST':
-        serializer = PatientSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        data = request.data
+
+        # Validate required fields
+        required_fields = ['name', 'gender', 'primary_mobile_no', 'password']
+        for field in required_fields:
+            if not data.get(field):
+                return Response(
+                    {"error": f"'{field}' is required."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+        try:
+            with connection.cursor() as cursor:
+                # 1) Insert new patient, return the new id
+                cursor.execute("""
+                    INSERT INTO patient (
+                        name,
+                        photo_url,
+                        gender,
+                        dob,
+                        primary_mobile_no,
+                        secondry_mobile_no,
+                        email,
+                        address,
+                        referred_by,
+                        blood_type,
+                        password
+                    )
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    RETURNING id
+                """, [
+                    data.get('name'),
+                    data.get('photo_url'),
+                    data.get('gender'),
+                    data.get('dob'),
+                    data.get('primary_mobile_no'),
+                    data.get('secondry_mobile_no'),
+                    data.get('email'),
+                    data.get('address'),
+                    data.get('referred_by'),
+                    data.get('blood_type'),
+                    data.get('password'),
+                ])
+                new_id = cursor.fetchone()[0]
+
+                # 2) Fetch the full row for the newly created patient
+                cursor.execute("SELECT * FROM patient WHERE id = %s", [new_id])
+                columns = [col[0] for col in cursor.description]
+                patient_data = dict(zip(columns, cursor.fetchone()))
+
+            # Return the full patient record
+            return Response(patient_data, status=status.HTTP_201_CREATED)
+
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
 
 
 @api_view(['GET', 'PUT', 'PATCH', 'DELETE'])
 def patient_detail(request, pk):
     """
-    Handles operations on an individual patient.
+    Handles operations on an individual patient, using raw SQL for updates.
     """
+    # 1) Fetch the patient or 404
     try:
         patient = Patient.objects.get(pk=pk)
     except Patient.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
+    # 2) GET → just serialize
     if request.method == 'GET':
         serializer = PatientSerializer(patient)
         return Response(serializer.data)
 
-    elif request.method in ['PUT', 'PATCH']:
-        partial = request.method == 'PATCH'  # Support partial updates
-        serializer = PatientSerializer(patient, data=request.data, partial=partial)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    elif request.method == 'DELETE':
+    # 3) DELETE → ORM delete is fine here
+    if request.method == 'DELETE':
         patient.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    # 4) PUT or PATCH → raw‑SQL update
+    if request.method in ['PUT', 'PATCH']:
+        data = request.data
+        # Only these columns are allowed to be written
+        allowed = [
+            'name', 'photo_url', 'gender', 'dob',
+            'primary_mobile_no', 'secondry_mobile_no',
+            'email', 'address', 'referred_by', 'blood_type'
+        ]
+
+        # Build SET clause and parameters
+        set_parts = []
+        params = []
+        for col in allowed:
+            if col in data:
+                set_parts.append(f"{col} = %s")
+                params.append(data[col])
+
+        if not set_parts:
+            return Response(
+                {"detail": "No updatable fields provided."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        params.append(pk)  # for WHERE id = %s
+        set_clause = ", ".join(set_parts)
+
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    f"UPDATE patient SET {set_clause} WHERE id = %s",
+                    params
+                )
+            # Re‑fetch & return the updated record
+            updated = Patient.objects.get(pk=pk)
+            serializer = PatientSerializer(updated)
+            return Response(serializer.data)
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 # Doctor APIs
