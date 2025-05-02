@@ -245,6 +245,25 @@ export default function ProfileHeader({
   // Determine which URL to show (fallback if needed)
   const effectivePhoto = photo || photoUrl || DEFAULT_PROFILE_IMAGE;
 
+  const handleSignOut = () => {
+    // Clearing authentication tokens
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('userData');
+
+    // Clearing session history and prevent back navigation
+    window.history.replaceState(null, null, '/');
+
+    // Forcing a hard redirect to login page
+    window.location.replace('/');
+
+    // Clearing cache for extra security
+    if ('caches' in window) {
+      caches.keys().then(names => {
+        names.forEach(name => caches.delete(name));
+      });
+    }
+  };
+
   return (
       <header className="doctor-header-container">
         {/* Floating Reminder */}
@@ -276,20 +295,21 @@ export default function ProfileHeader({
           </div>
         </div>
 
-        {/* Action Buttons */}
-        {actions.length > 0 && (
-            <div className="action-buttons">
-              {actions.map(a => (
-                  <button
-                      key={a.name}
-                      className="btn btn-secondary"
-                      onClick={() => onAction(a.name)}
-                  >
-                    {a.label}
-                  </button>
-              ))}
-            </div>
-        )}
+        {/* Action Buttons - Always rendered */}
+        <div className="action-buttons">
+          {/* Conditional action buttons */}
+          {actions.length > 0 && actions.map(a => (
+              <button
+                  key={a.name}
+                  className="btn btn-secondary"
+                  onClick={() => onAction(a.name)}
+              >
+                {a.label}
+              </button>
+          ))}
+
+
+        </div>
 
         {/* Navigation Tabs */}
         {tabs.length > 0 && (
@@ -359,13 +379,22 @@ export default function ProfileHeader({
                     </div>
                   </div>
                   <div>
+
                     {!isEditing ? (
-                        <button
-                            onClick={() => setIsEditing(true)}
-                            className="btn btn-primary mr-2 text-sm"
-                        >
-                          Edit
-                        </button>
+                        <div className="flex gap-2">
+                          <button
+                              onClick={() => setIsEditing(true)}
+                              className="btn btn-primary mr-2 text-sm"
+                          >
+                            Edit
+                          </button>
+                          <button
+                              onClick={handleSignOut}
+                              className="btn btn-signout text-sm"
+                          >
+                            Sign Out
+                          </button>
+                        </div>
                     ) : (
                         <>
                           <button
