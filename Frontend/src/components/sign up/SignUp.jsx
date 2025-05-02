@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import Checkbox from '@mui/material/Checkbox';
 import CssBaseline from '@mui/material/CssBaseline';
 import Divider from '@mui/material/Divider';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -16,6 +17,7 @@ import {FormHelperText, RadioGroup, Radio } from '@mui/material';
 import AppTheme from '../sign in/theme/AppTheme';
 import ColorModeSelect from '../sign in/theme/ColorModeSelect';
 import { LogoIcon } from '../sign in/CustomIcons';
+import Preload from '../preload'
 import { useNavigate } from "react-router-dom";
 
 const Card = styled(MuiCard)(({ theme }) => ({
@@ -84,6 +86,8 @@ export default function SignUp(props) {
     const [genderError, setGenderError] = useState(false);
     const [genderErrorMessage, setGenderErrorMessage] = useState('');
 
+    const [loading, setLoading] = React.useState(false);
+    const [showPassword, setShowPassword] = React.useState(false);
 
     const navigate = useNavigate();
 
@@ -169,6 +173,8 @@ export default function SignUp(props) {
         event.preventDefault();
         if (!validateInputs()) return;
 
+        setLoading(true);
+
         // 🔍 DEBUG: ensure your env var is loaded
         console.log('🚀 VITE_API_URL =', import.meta.env.VITE_API_URL);
 
@@ -204,6 +210,8 @@ export default function SignUp(props) {
                 body: JSON.stringify(payload),
             });
 
+            setLoading(false);
+
             if (response.ok) {
                 const result = await response.json();
                 if (buttonClicked === 'doctor') {
@@ -219,6 +227,7 @@ export default function SignUp(props) {
         } catch (error) {
             console.error('Network error:', error);
             setNameErrorMessage('Network error, please try again');
+            setLoading(false);
         }
     };
 
@@ -229,7 +238,7 @@ export default function SignUp(props) {
             <SignUpContainer direction="column" justifyContent="space-between">
                 <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
                 <Card variant="outlined">
-
+                    {loading && <Preload />}
                     <Box
                         component="form"
                         onSubmit={handleSubmit}
@@ -280,7 +289,7 @@ export default function SignUp(props) {
                                 fullWidth
                                 name="password"
                                 placeholder="••••••"
-                                type="password"
+                                type={showPassword ? 'text' : 'password'}
                                 id="password"
                                 autoComplete="new-password"
                                 variant="outlined"
@@ -288,7 +297,18 @@ export default function SignUp(props) {
                                 helperText={passwordErrorMessage}
                                 color={passwordError ? 'error' : 'primary'}
                             />
+
                         </FormControl>
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    value="showPassword"
+                                    color="primary"
+                                    onChange={() => setShowPassword(!showPassword)}
+                                />
+                            }
+                            label="Show password"
+                        />
                         <FormControl>
                             <FormLabel htmlFor="primaryMobileNo">Primary mobile number</FormLabel>
                             <TextField

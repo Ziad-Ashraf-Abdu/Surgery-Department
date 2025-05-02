@@ -17,9 +17,9 @@ import ForgotPassword from './ForgotPassword';
 import AppTheme from './theme/AppTheme';
 import ColorModeSelect from './theme/ColorModeSelect';
 import { LogoIcon } from './CustomIcons';
+import Preload from '../preload'
 import { useNavigate } from 'react-router-dom';
 
-//import { patientUser, doctorUser } from "../../data/sampleData";
 
 const Card = styled(MuiCard)(({ theme }) => ({
     display: 'flex',
@@ -70,6 +70,8 @@ export default function SignIn(props) {
     const [passwordError, setPasswordError] = React.useState(false);
     const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
     const [open, setOpen] = React.useState(false);
+    const [loading, setLoading] = React.useState(false);
+    const [showPassword, setShowPassword] = React.useState(false);
     const navigate = useNavigate();
 
     const handleClickOpen = () => {
@@ -87,6 +89,8 @@ export default function SignIn(props) {
     const handleSubmit = async (event) => {
         event.preventDefault();
         if (!validateInputs()) return;
+
+        setLoading(true);
 
         // 🔍 DEBUG: check that VITE_API_URL is loaded
         console.log('🚀 VITE_API_URL =', import.meta.env.VITE_API_URL);
@@ -111,6 +115,8 @@ export default function SignIn(props) {
             });
             const json = await res.json();
 
+            setLoading(false);
+
             if (res.ok) {
                 if (json.role === 'patient') {
                     navigate('/patient-home-page', { state: { patientUser: json.user } });
@@ -131,6 +137,7 @@ export default function SignIn(props) {
             setPasswordErrorMessage(msg);
             setIdError(true);
             setPasswordError(true);
+            setLoading(false);
         }
     };
 
@@ -169,6 +176,7 @@ export default function SignIn(props) {
             <SignInContainer direction="column" justifyContent="space-between">
                 <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
                 <Card variant="outlined">
+                    {loading && <Preload />}
                     <LogoIcon />
                     <Typography
                         component="h1"
@@ -213,7 +221,7 @@ export default function SignIn(props) {
                                 helperText={passwordErrorMessage}
                                 name="password"
                                 placeholder="••••••"
-                                type="password"
+                                type={showPassword ? 'text' : 'password'}
                                 id="password"
                                 autoComplete="current-password"
                                 autoFocus
@@ -223,6 +231,16 @@ export default function SignIn(props) {
                                 color={passwordError ? 'error' : 'primary'}
                             />
                         </FormControl>
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    value="showPassword"
+                                    color="primary"
+                                    onChange={() => setShowPassword(!showPassword)}
+                                />
+                            }
+                            label="Show password"
+                        />
                         <FormControlLabel
                             control={<Checkbox value="remember" color="primary" />}
                             label="Remember me"
