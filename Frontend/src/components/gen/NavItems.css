@@ -1,0 +1,66 @@
+:root {
+    --white: #fff;
+    --teal: #7ac6d2;
+    --mint: #b5fccd;
+}
+
+/* Base style for all nav-item anchors */
+.nav-item {
+    display: inline-block;
+    margin-right: 16px;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: color 0.2s;
+    color: var(--white);
+}
+.nav-item:hover {
+    color: var(--teal);
+}
+
+/* Specific link overrides (if you want custom tweaks) */
+.privacy-page {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+.privacy-page h1 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+.privacy-page h2 {
+    font-size: 1.5rem;
+    margin-top: 20px;
+}
+.privacy-page p, .privacy-page ul {
+    font-size: 1rem;
+    line-height: 1.6;
+}
+.privacy-page ul {
+    list-style: disc;
+    margin: 10px 0 20px 20px;
+}
+
+.covid-19         { /* custom style… */ }
+.find-doctor      { /* … */ }
+.all-locations    { /* … */ }
+.get-care         { /* … */ }
+.patients-visitors{ /* … */ }
+.about-us         { /* … */ }
+.donate           { /* … */ }
+.careers          { /* … */ }
+
+/* MyChart button */
+.btn.mychart-btn {
+    background: var(--teal);
+    color: #7ac6d2;
+    border: none;
+    padding: 3px 14px;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+}
+.btn.mychart-btn:hover {
+    background: var(--mint);
+    transform: translateY(-1px);
+}

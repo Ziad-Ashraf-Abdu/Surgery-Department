@@ -805,3 +805,74 @@ nav ul li.active {
 .btn-signout:active {
   background-color: #bd2130;
 }
+
+/* PANEL CONTAINER */
+.panel-container {
+  background: var(--color-card-bg);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* HEADER */
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid var(--color-baby-blue);
+  padding-bottom: 0.5rem;
+}
+
+.panel-header h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: var(--text-heading);
+}
+
+.panel-count {
+  background: var(--color-secondary);
+  color: white;
+  font-size: 0.85rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 1rem;
+}
+
+/* ITEM LIST */
+.panel-item-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* INDIVIDUAL ITEM CARD */
+.panel-item {
+  background-color: var(--color-card-bg);
+  padding: 1rem;
+  border-radius: 0.75rem;
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.panel-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+/* DIVIDER */
+.panel-divider {
+  margin-top: 1rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* EMPTY STATE */
+.panel-empty {
+  font-style: italic;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 0.5rem;
+}

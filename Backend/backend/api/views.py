@@ -5,15 +5,17 @@ from rest_framework import status
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
+import traceback
+from rest_framework.views import APIView
 
 from .models import (
     Patient, Doctors, Scan, Appointment, FamilyRelatives,
-    Grouptable, MedicalHistory
+    Grouptable, MedicalHistory, Surgery
 )
 from .serializers import (
     PatientSerializer, DoctorSerializer, ScanSerializer,
     AppointmentSerializer, FamilyRelativesSerializer,
-    GrouptableSerializer, MedicalHistorySerializer
+    GrouptableSerializer, MedicalHistorySerializer, ScanSerializer, SurgerySerializer
 )
 
 # -----------------------------------------------------------------------------
@@ -82,6 +84,51 @@ def login(request):
             {"detail": f"Server error: {str(exc)}"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+
+#--------------------------------------------------------------------------------------------
+#Surgery Methods
+#---------------------------------------------------------------------------------------------
+@api_view(['GET', 'POST'])
+@renderer_classes([JSONRenderer])
+def surgery_list_create(request):
+    # GET → list (with optional doctor filter)
+    if request.method == 'GET':
+        try:
+            qs = Surgery.objects.all()
+            doc_id = request.query_params.get('doctor')
+            if doc_id:
+                qs = qs.filter(doctor_id=doc_id)
+            serializer = SurgerySerializer(qs, many=True)
+            return Response(serializer.data)
+
+        except Exception as exc:
+            # Return the exception detail + full traceback for debugging
+            tb = traceback.format_exc()
+            return Response(
+                {
+                    "detail": str(exc),
+                    "traceback": tb
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+    # POST → create new surgery
+    serializer = SurgerySerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def surgery_detail(request, pk):
+
+    try:
+        surgery = Surgery.objects.get(pk=pk)
+    except Surgery.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    serializer = SurgerySerializer(surgery)
+    return Response(serializer.data)
 
 # -----------------------------------------------------------------------------
 # Patient List/Create (raw SQL) — unchanged except password hashing
@@ -273,24 +320,32 @@ def patient_scans(request, patient_id):
 
 
 # Appointment APIs
-@api_view(['GET'])
-def patient_appointments(request, patient_id):
+@api_view(['GET', 'POST'])
+def appointments_list_create(request):
     """
-    Retrieves all appointments related to a specific patient.
+    GET  /api/appointments/?patient=<id>&doctor=<id>
+      → filter by either or both query-params
+    POST /api/appointments/
+      → create new appointment; body must include patient, doctor, timestamp, address, status
     """
-    appointments = Appointment.objects.filter(patient_id=patient_id)
-    serializer = AppointmentSerializer(appointments, many=True)
-    return Response(serializer.data)
+    if request.method == 'GET':
+        qs = Appointment.objects.all()
+        patient_id = request.query_params.get('patient')
+        doctor_id  = request.query_params.get('doctor')
+        if patient_id:
+            qs = qs.filter(patient_id=patient_id)
+        if doctor_id:
+            qs = qs.filter(doctor_id=doctor_id)
 
+        serializer = AppointmentSerializer(qs, many=True)
+        return Response(serializer.data)
 
-@api_view(['GET'])
-def doctor_appointments(request, doctor_id):
-    """
-    Retrieves all appointments related to a specific doctor.
-    """
-    appointments = Appointment.objects.filter(doctor_id=doctor_id)
-    serializer = AppointmentSerializer(appointments, many=True)
-    return Response(serializer.data)
+    # POST
+    serializer = AppointmentSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Family APIs
@@ -316,11 +371,22 @@ def patient_group(request, patient_id):
 
 
 # Medical History APIs
-@api_view(['GET'])
+@api_view(['GET', 'POST'])
 def patient_medical_history(request, patient_id):
     """
-    Retrieves all medical history records for a specific patient.
+    GET  /api/patients/<patient_id>/medical_history/  -> list history
+    POST /api/patients/<patient_id>/medical_history/  -> create new record
     """
-    history = MedicalHistory.objects.filter(patient_id=patient_id)
-    serializer = MedicalHistorySerializer(history, many=True)
-    return Response(serializer.data)
+    if request.method == 'GET':
+        history = MedicalHistory.objects.filter(patient_id=patient_id)
+        serializer = MedicalHistorySerializer(history, many=True)
+        return Response(serializer.data)
+
+    # POST
+    data = request.data.copy()
+    data['patient'] = patient_id
+    serializer = MedicalHistorySerializer(data=data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

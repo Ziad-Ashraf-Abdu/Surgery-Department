@@ -1,0 +1,391 @@
+:root {
+    /* Theme Colors */
+    --color-primary:    #3a59d1;
+    --color-secondary:  #3d90d7;
+    --color-teal:       #7ac6d2;
+    --color-mint:       #b5fccd;
+    --color-white:      #fff;
+    --color-overlay:    rgba(0, 0, 0, 0.4);
+
+    /* Typography */
+    --font-base:        'Arial, sans-serif';
+    --font-size-base:   1rem;      /* 16px */
+    --line-height:      1.5;
+
+    /* Spacing */
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+
+    /* Breakpoints */
+    --bp-mobile:  600px;
+    --bp-tablet:  800px;
+    --bp-desktop: 1200px;
+}
+
+/* 0. Reset & Base */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+body {
+    font: var(--font-size-base)/var(--line-height) var(--font-base);
+    color: #1a1a1a;
+    background: #fafafa;
+}
+a,
+button {
+    font: inherit;
+    color: inherit;
+    text-decoration: none;
+    border: none;
+    background: none;
+}
+
+/* Global focus state */
+:focus {
+    outline: 3px solid var(--color-mint);
+    outline-offset: 2px;
+}
+
+/* 1. Skip to Content */
+.skip-link {
+    position: absolute;
+    top: var(--space-sm);
+    left: var(--space-sm);
+    background: var(--color-primary);
+    color: var(--color-white);
+    padding: var(--space-xs) var(--space-sm);
+    transform: translateY(-150%);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+}
+.skip-link:focus {
+    transform: translateY(0);
+}
+
+/* 2. Cookie Banner */
+.cookie-banner {
+    background: var(--color-primary);
+    color: var(--color-white);
+    padding: var(--space-sm) var(--space-md);
+    text-align: center;
+    font-size: 0.9rem;
+}
+.cookie-banner .cookie-accept {
+    margin-left: var(--space-md);
+    padding: var(--space-xs) var(--space-sm);
+    background: var(--color-secondary);
+    color: var(--color-white);
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.3s ease;
+}
+.cookie-banner .cookie-accept:hover {
+    background: var(--color-mint);
+}
+
+/* 3. Top Contact Bar */
+.top-contact-bar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    background: var(--color-secondary);
+    color: var(--color-white);
+    padding: var(--space-sm) var(--space-md);
+}
+.contact-btn {
+    background: transparent;
+    color: var(--color-white);
+    cursor: pointer;
+    margin-right: var(--space-md);
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+}
+.contact-btn:hover {
+    color: var(--color-teal);
+}
+.language-select {
+    padding: var(--space-xs);
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    background: var(--color-white);
+    color: var(--color-primary);
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+
+}
+
+/* 4. Main Navigation */
+.main-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--color-primary);
+    padding: var(--space-md);
+}
+.logo {
+    display: flex;
+    align-items: center;
+}
+.nav-center {
+    display: flex;
+    gap: var(--space-md);
+}
+.nav-item {
+    color: var(--color-white);
+    font-size: 0.95rem;
+    transition: color 0.3s ease;
+}
+.nav-item:hover {
+    color: var(--color-mint);
+}
+.nav-right {
+    display: flex;
+    align-items: center;
+}
+.search-icon {
+    background: none;
+    color: var(--color-white);
+    font-size: 1.2rem;
+    margin-right: var(--space-md);
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+.search-icon:hover {
+    color: var(--color-mint);
+}
+.hamburger {
+    display: none;
+    flex-direction: column;
+    gap: var(--space-xs);
+    cursor: pointer;
+}
+.hamburger span {
+    width: 22px;
+    height: 2px;
+    background: var(--color-white);
+    transition: background 0.3s ease;
+}
+
+/* 5. Mobile Nav Toggle */
+@media (max-width: var(--bp-tablet)) {
+    .nav-center {
+        display: none;
+    }
+    .hamburger {
+        display: flex;
+    }
+    body.nav-open .nav-center {
+        display: flex;
+        flex-direction: column;
+        background: var(--color-primary);
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        padding: var(--space-md) 0;
+        z-index: 50;
+    }
+}
+
+/* 6. Hero Section */
+.hero {
+    position: relative;
+    height: 400px;
+    background: url('https://www.blessinghealth.org/sites/default/files/styles/crop_1920/public/images/fields/full-width-image/2022-05/surgery_hero.jpg?itok=-FRm7Ayj') center/cover no-repeat;
+}
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: var(--color-overlay);
+}
+.hero-text {
+    position: relative;
+    color: var(--color-white);
+    text-align: center;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 0 var(--space-md);
+    animation: fadeIn 1s ease-out;
+}
+.hero-text h1 {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+}
+.hero-text p {
+    font-size: 1.1rem;
+}
+
+/* 7. Search Panel */
+.search-panel {
+    background: var(--color-white);
+    padding: var(--space-lg) var(--space-md);
+    margin: -40px auto var(--space-lg);
+    max-width: 900px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 10;
+}
+.search-panel form {
+    display: flex;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.search-input {
+    padding: var(--space-sm);
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    flex: 1 1 200px;
+}
+.action-btn {
+    background: var(--color-primary);
+    color: var(--color-white);
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+.action-btn:hover {
+    background: var(--color-mint);
+    transform: translateY(-2px);
+}
+
+/* 8. Auth Buttons */
+.auth-buttons {
+    position: fixed;
+    top: 140px;
+    right: var(--space-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    z-index: 20;
+}
+.auth-buttons .btn {
+    padding: var(--space-sm) var(--space-md);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+}
+.login-btn {
+    background: var(--color-white);
+    color: var(--color-primary);
+    border: 1px solid var(--color-primary);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-align: center;
+    width: 20%;
+}
+.signup-btn {
+    background: var(--color-primary);
+    color: var(--color-white);
+    border: 1px solid var(--color-primary);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-align: center;
+    width: 26%;
+
+}
+.auth-buttons .btn:hover {
+    opacity: 0.8;
+}
+
+/* 9. Footer */
+.footer {
+    background: var(--color-white);
+    border-top: 1px solid #ececec;
+    padding: var(--space-lg) var(--space-md);
+    font-size: 0.9rem;
+    color: #1a1a1a;
+    width: 100%;
+}
+.footer-top {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    max-width: var(--bp-desktop);
+    margin: 0 auto;
+}
+.footer-col {
+    flex: 1 1 180px;
+    margin: var(--space-sm);
+}
+.footer-col-logo img {
+    max-width: 200px;
+    height: auto;
+}
+.footer-col h4 {
+    margin-bottom: var(--space-sm);
+    font-weight: 600;
+}
+.footer-col ul {
+    list-style: none;
+    padding: 0;
+}
+.footer-col ul li {
+    margin-bottom: var(--space-xs);
+}
+.footer-link {
+    color: #1a1a1a;
+    transition: color 0.2s ease;
+}
+.footer-link:hover {
+    color: var(--color-teal);
+}
+.social-icons {
+    display: flex;
+    gap: var(--space-md);
+}
+.social-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: #fff;
+    transition: transform 0.2s ease;
+}
+.social-icon:hover {
+    transform: scale(1.1);
+}
+.social-icon.facebook  { background: #3b5998; }
+.social-icon.twitter   { background: #1da1f2; }
+.social-icon.linkedin  { background: #0077b5; }
+.social-icon.instagram {
+    background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285aeb 90%);
+}
+.footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #ececec;
+    padding-top: var(--space-md);
+    max-width: var(--bp-desktop);
+    margin: 0 auto;
+}
+.footer-copy {
+    font-size: 0.85rem;
+}
+.footer-policy-links a:not(:first-child) {
+    margin-left: var(--space-lg);
+}
+
+/* 10. Animations & Reduced Motion */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0);     }
+}
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        transition: none !important;
+        animation: none !important;
+    }
+}

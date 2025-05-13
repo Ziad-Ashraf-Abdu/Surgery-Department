@@ -146,7 +146,9 @@ export default function SignIn(props) {
                 setPasswordErrorMessage(msg);
                 return;
             }
-
+            if (data.role === 'admin') {
+                return navigate('/dashboard', { state: { adminUser: data.user } });
+            }
             if (data.role === 'patient') {
                 navigate('/patient-home-page', { state: { patientUser: data.user } });
             } else {
