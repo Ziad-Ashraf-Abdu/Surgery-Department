@@ -23,4 +23,9 @@ urlpatterns = [
     # Surgeries (list/create + detail)
     path('surgeries/',    views.surgery_list_create, name='surgery_list_create'),
     path('surgeries/<int:pk>/', views.surgery_detail,   name='surgery_detail'),
+
+    path('stats/', views.get_stats),
+    path('doctors/gender/', views.get_doctors_gender),
+    path('patients/age-distribution/', views.get_patients_age_distribution),
+    path('appointments/', views.get_appointments),
 ]

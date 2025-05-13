@@ -6,6 +6,7 @@ from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 import traceback
+from django.http import JsonResponse
 from rest_framework.views import APIView
 
 from .models import (
@@ -21,6 +22,41 @@ from .serializers import (
 # -----------------------------------------------------------------------------
 # Login API
 # -----------------------------------------------------------------------------
+
+def get_stats(request):
+    stats_data = [
+        {'title': 'Total Appointments', 'value': 124},
+        {'title': 'Number of doctors', 'value': 76},
+        {'title': 'Number of patients', 'value': 35},
+        {'title': 'Surgeons Available', 'value': 12},
+    ]
+    return JsonResponse(stats_data, safe=False)
+
+def get_doctors_gender(request):
+    pie_data = [
+        {'label': 'Male', 'value': 9},
+        {'label': 'Female', 'value': 3},
+    ]
+    return JsonResponse(pie_data, safe=False)
+
+def get_patients_age_distribution(request):
+    age_data = [
+        {'ageGroup': '0-18', 'count': 8},
+        {'ageGroup': '19-35', 'count': 40},
+        {'ageGroup': '36-60', 'count': 55},
+        {'ageGroup': '60+', 'count': 21},
+    ]
+    return JsonResponse(age_data, safe=False)
+
+def get_appointments(request):
+    appointments = [
+        {'id': 1, 'name': 'Ali Hassan', 'email': 'ali@gmail.com', 'address': 'Cairo', 'status': 'Confirmed'},
+        {'id': 2, 'name': 'Sara Youssef', 'email': 'sara@yahoo.com', 'address': 'Giza', 'status': 'Pending'},
+        {'id': 3, 'name': 'John Doe', 'email': 'john@example.com', 'address': 'Alexandria', 'status': 'Completed'},
+        {'id': 4, 'name': 'Mona Samir', 'email': 'mona@hotmail.com', 'address': 'Mansoura', 'status': 'Cancelled'},
+    ]
+    return JsonResponse(appointments, safe=False)
+
 @csrf_exempt
 @api_view(['POST'])
 @renderer_classes([JSONRenderer])
