@@ -59,50 +59,22 @@ export default function Dashboard() {
     // Fetch all pieces of dashboard data
     const fetchDashboardData = useCallback(async () => {
         try {
-            // 1) Total appointments
+            const statsRes = await fetch(`${API_URL}/api/stats/`);
+            const stats = statsRes.ok ? await statsRes.json() : [];
+
+            const genderRes = await fetch(`${API_URL}/api/doctors_gender/`);
+            const pie = genderRes.ok ? await genderRes.json() : [];
+
+            const ageRes = await fetch(`${API_URL}/api/patients_age_distribution/`);
+            const ageArr = ageRes.ok ? await ageRes.json() : [];
+
             const apptRes = await fetch(`${API_URL}/api/appointments/`);
             const allAppts = apptRes.ok ? await apptRes.json() : [];
 
-            // 2) Total doctors
-            const docRes = await fetch(`${API_URL}/api/doctors/`);
-            const allDocs = docRes.ok ? await docRes.json() : [];
-
-            // 3) Total patients
-            const patRes = await fetch(`${API_URL}/api/patients/`);
-            const allPats = patRes.ok ? await patRes.json() : [];
-
-            // 4) All surgeries
-            const surgRes = await fetch(`${API_URL}/api/surgeries/`);
-            const allSurgs = surgRes.ok ? await surgRes.json() : [];
-
-            // 5) Doctors by gender
-            const genderCount = allDocs.reduce((acc, d) => {
-                acc[d.gender] = (acc[d.gender] || 0) + 1;
-                return acc;
-            }, {});
-            const pie = Object.entries(genderCount).map(([label, value]) => ({ label, value }));
-
-            // 6) Patient age distribution
-            const buckets = { '0-18':0,'19-35':0,'36-60':0,'60+':0 };
-            allPats.forEach(p => {
-                const age = Math.floor((Date.now() - new Date(p.dob)) / 3.15576e10);
-                if (age < 19) buckets['0-18']++;
-                else if (age < 36) buckets['19-35']++;
-                else if (age < 61) buckets['36-60']++;
-                else buckets['60+']++;
-            });
-            const ageArr = Object.entries(buckets).map(([ageGroup, count]) => ({ ageGroup, count }));
-
-            setStats([
-                { title: 'Total Appointments', value: allAppts.length },
-                { title: 'Number of Doctors', value: allDocs.length },
-                { title: 'Number of Patients', value: allPats.length },
-                { title: 'Total Surgeries', value: allSurgs.length }
-            ]);
+            setStats(stats);
             setPieData(pie);
             setAgeData(ageArr);
             setAppointments(allAppts);
-            setSurgeries(allSurgs);
         } catch (err) {
             console.error('Dashboard fetch error:', err);
         }
@@ -201,18 +173,17 @@ export default function Dashboard() {
                         <Table>
                             <TableHead>
                                 <TableRow>
-                                    <TableCell>ID</TableCell><TableCell>Patient</TableCell>
-                                    <TableCell>Doctor</TableCell><TableCell>Date</TableCell>
+                                    <TableCell>ID</TableCell>
+                                    <TableCell>Patient</TableCell>
                                     <TableCell>Status</TableCell>
                                 </TableRow>
                             </TableHead>
+
                             <TableBody>
                                 {appointments.map(a => (
                                     <TableRow key={a.id}>
                                         <TableCell>{a.id}</TableCell>
-                                        <TableCell>{a.patient_name || a.patient}</TableCell>
-                                        <TableCell>{a.doctor_name || a.doctor}</TableCell>
-                                        <TableCell>{new Date(a.date).toLocaleDateString()}</TableCell>
+                                        <TableCell>{a.name}</TableCell>
                                         <TableCell>{a.status}</TableCell>
                                     </TableRow>
                                 ))}
@@ -229,14 +200,15 @@ export default function Dashboard() {
                     {['date','time','procedure','doctor','patient','room'].map(field => (
                         <TextField
                             key={field}
-                            label={field.charAt(0).toUpperCase()+field.slice(1)}
+                            label={field.charAt(0).toUpperCase() + field.slice(1)}
                             name={field}
-                            type={field==='date'? 'date' : field==='time'? 'time' : 'text'}
+                            type={field === 'date' ? 'date' : field === 'time' ? 'time' : 'text'}
                             value={newSurg[field]}
                             onChange={handleChange}
-                            InputLabelProps={{ shrink: field==='date'||field==='time' }}
+                            InputLabelProps={{ shrink: true }}
                             fullWidth
                         />
+
                     ))}
                 </DialogContent>
                 <DialogActions>
