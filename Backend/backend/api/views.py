@@ -27,24 +27,24 @@ def get_stats(request):
     stats_data = [
         {'title': 'Total Appointments', 'value': 124},
         {'title': 'Number of doctors', 'value': 76},
-        {'title': 'Number of patients', 'value': 35},
+        {'title': 'Number of patients', 'value': 115},
         {'title': 'Surgeons Available', 'value': 12},
     ]
     return JsonResponse(stats_data, safe=False)
 
 def get_doctors_gender(request):
     pie_data = [
-        {'label': 'Male', 'value': 9},
-        {'label': 'Female', 'value': 3},
+        {'label': 'Male', 'value': 40},
+        {'label': 'Female', 'value': 36},
     ]
     return JsonResponse(pie_data, safe=False)
 
 def get_patients_age_distribution(request):
     age_data = [
-        {'ageGroup': '0-18', 'count': 8},
-        {'ageGroup': '19-35', 'count': 40},
-        {'ageGroup': '36-60', 'count': 55},
-        {'ageGroup': '60+', 'count': 21},
+        {"ageGroup": "0-18", "count": 8},
+        {"ageGroup": "19-35", "count": 35},
+        {"ageGroup": "36-60", "count": 50},
+        {"ageGroup": "60+", "count": 22}
     ]
     return JsonResponse(age_data, safe=False)
 

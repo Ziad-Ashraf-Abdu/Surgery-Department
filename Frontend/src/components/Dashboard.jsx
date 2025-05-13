@@ -62,11 +62,13 @@ export default function Dashboard() {
             const statsRes = await fetch(`${API_URL}/api/stats/`);
             const stats = statsRes.ok ? await statsRes.json() : [];
 
-            const genderRes = await fetch(`${API_URL}/api/doctors_gender/`);
+            const genderRes = await fetch(`${API_URL}/api/doctors/gender/`);
             const pie = genderRes.ok ? await genderRes.json() : [];
+            console.log('Pie Data:', pie);
 
-            const ageRes = await fetch(`${API_URL}/api/patients_age_distribution/`);
+            const ageRes = await fetch(`${API_URL}/api/patients/age-distribution/`);
             const ageArr = ageRes.ok ? await ageRes.json() : [];
+            console.log('Age Data:', ageArr);
 
             const apptRes = await fetch(`${API_URL}/api/appointments/`);
             const allAppts = apptRes.ok ? await apptRes.json() : [];
