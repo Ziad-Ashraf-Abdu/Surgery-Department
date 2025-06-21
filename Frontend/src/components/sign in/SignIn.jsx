@@ -13,11 +13,11 @@ import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
-import ForgotPassword from './ForgotPassword';
-import Preload from '../preload';
-import AppTheme from './theme/AppTheme';
-import ColorModeSelect from './theme/ColorModeSelect';
-import { LogoIcon } from './CustomIcons';
+import ForgotPassword from './ForgotPassword.tsx';
+import Preload from '../preload.jsx';
+import AppTheme from './theme/AppTheme.tsx';
+import ColorModeSelect from './theme/ColorModeSelect.tsx';
+import { LogoIcon } from './CustomIcons.tsx';
 import { useNavigate } from 'react-router-dom';
 
 const Card = styled(MuiCard)(({ theme }) => ({
