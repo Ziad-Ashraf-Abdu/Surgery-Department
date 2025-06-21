@@ -8,7 +8,7 @@ gracefulify(require('fs'));
 
 export default defineConfig({
     plugins: [react()],
-    base: '/Surgery-Department/',
+    base: './',
 
     server: {
         watch: {
