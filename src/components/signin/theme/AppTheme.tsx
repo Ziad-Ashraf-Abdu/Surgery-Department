@@ -6,7 +6,7 @@ import { inputsCustomizations } from './customizations/inputs.tsx';
 // @ts-ignore
 import { dataDisplayCustomizations } from './customizations/dataDisplay.tsx';
 // @ts-ignore
-import { feedbackCustomizations } from './customizations/feedback.tsx';
+import { feedbackCustomizations } from './customizations/feedBack.tsx';
 // @ts-ignore
 import { navigationCustomizations } from './customizations/navigation.tsx';
 // @ts-ignore
