@@ -2,8 +2,8 @@ import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 import SurgeryDepartmentPage from './SurgeryDepartment';
-import SignIn from './sign in/SignIn';
-import SignUp from './sign up/SignUp';
+import SignIn from './signin/SignIn';
+import SignUp from './signup/SignUp';
 import DoctorHP from './doctorHP';
 import PatientHP from './patientHP';
 import Dashboard from './Dashboard';

@@ -15,9 +15,9 @@ import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
 import {FormHelperText, RadioGroup, Radio } from '@mui/material';
 import Preload from '../preload.jsx'
-import AppTheme from '../sign in/theme/AppTheme.tsx';
-import ColorModeSelect from '../sign in/theme/ColorModeSelect.tsx';
-import { LogoIcon } from '../sign in/CustomIcons.tsx';
+import AppTheme from '../signin/theme/AppTheme.tsx';
+import ColorModeSelect from '../signin/theme/ColorModeSelect.tsx';
+import { LogoIcon } from '../signin/CustomIcons.tsx';
 import { useNavigate } from "react-router-dom";
 
 const Card = styled(MuiCard)(({ theme }) => ({

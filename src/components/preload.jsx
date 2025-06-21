@@ -1,4 +1,4 @@
-import { LogoIcon } from './sign in/CustomIcons.tsx';
+import { LogoIcon } from './signin/CustomIcons.tsx';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 
