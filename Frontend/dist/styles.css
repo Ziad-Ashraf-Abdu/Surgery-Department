@@ -1,0 +1,278 @@
+/* Global Styles */
+.App {
+  font-family: "Arial", sans-serif;
+  text-align: left;
+  background: #f5f7fb;
+}
+
+/* Patient HP Container */
+.patient-hp-container {
+  padding: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Header Section */
+.patient-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.profile-summary {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.profile-image {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #4f46e5;
+}
+
+.patient-name {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #1f2937;
+}
+
+.premium-badge {
+  background-color: #e0e7ff;
+  color: #4f46e5;
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
+  font-size: 0.95rem;
+}
+
+/* Schedule Section */
+.schedule-section {
+  margin-bottom: 2rem;
+}
+
+.schedule-item {
+  padding: 0.75rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+/* Clinical Visits & Medication Cards */
+.clinical-visits,
+.medication-routine {
+  margin-bottom: 2rem;
+}
+
+.visit-card,
+.medication-card {
+  background: #ffffff;
+  padding: 1rem;
+  border-radius: 1rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.visit-card h3,
+.medication-card h3 {
+  margin: 0 0 0.5rem;
+}
+
+/* Check-up Banner */
+.checkup-banner {
+  background: #f0fdf4;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+/* Search Container */
+.search-container {
+  margin-top: 1.5rem;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 1rem;
+  border: 1px solid #d1d1d1;
+}
+
+/* Modal Styles */
+.edit-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.edit-modal {
+  background: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.modal-photo-section {
+  margin-bottom: 1rem;
+}
+
+/* Hidden Input */
+.hidden-input {
+  display: none;
+}
+
+/* Button Styles */
+.cancel-button,
+.save-button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 1rem;
+}
+
+.cancel-button {
+  background-color: #e0e0e0;
+  margin-right: 0.5rem;
+}
+
+.save-button {
+  background-color: #4f46e5;
+  color: white;
+}
+
+.patient-hp-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Header */
+.patient-header {
+  margin-bottom: 2rem;
+}
+
+/* Grid Layout for Main Content */
+.main-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1.5rem;
+}
+
+/* Schedule Column */
+.schedule-section {
+  background: #f9fafb;
+  padding: 1rem;
+  border-radius: 1rem;
+}
+.schedule-item {
+  padding: 0.75rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+/* Clinical Visits & Medication Column */
+.clinical-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.visit-card,
+.medication-card {
+  background: #ffffff;
+  padding: 1rem;
+  border-radius: 1rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Profile Info Column */
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.profile-summary {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+}
+.profile-image {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #4f46e5;
+}
+.patient-name {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #1f2937;
+}
+.premium-badge {
+  background-color: #e0e7ff;
+  color: #4f46e5;
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
+  font-size: 0.95rem;
+}
+.checkup-banner {
+  background: #f0fdf4;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  text-align: center;
+}
+.search-input {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 1rem;
+  border: 1px solid #d1d1d1;
+}
+
+/* Modal Styles */
+.edit-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.edit-modal {
+  background: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+.modal-photo-section {
+  margin-bottom: 1rem;
+}
+.hidden-input {
+  display: none;
+}
+.cancel-button,
+.save-button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 1rem;
+}
+.cancel-button {
+  background-color: #e0e0e0;
+  margin-right: 0.5rem;
+}
+.save-button {
+  background-color: #4f46e5;
+  color: white;
+}
